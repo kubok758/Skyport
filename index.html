@@ -148,7 +148,7 @@
     .mini-buy{height:31px;padding:0 11px;border-radius:10px;background:var(--blue);color:#fff;font-size:9px;font-weight:900}
     .mini-buy:disabled{background:#c7d2da;color:#758491}
     .built-mark{position:absolute;right:9px;top:9px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#32c990;color:#fff}
-    .level-dots{display:flex;gap:4px;margin:5px 0 10px}.level-dots i{display:block;width:18px;height:4px;border-radius:3px;background:#d8e2e9}.level-dots i.on{background:#4a94fa}
+    .level-dots{display:flex;gap:3px;margin:5px 0 10px;max-width:100%}.level-dots i{display:block;flex:1;min-width:5px;height:4px;border-radius:3px;background:#d8e2e9}.level-dots i.on{background:#4a94fa}
     .upgrade-effect{font-size:9px;color:#16845e;font-weight:700}
     .section-label{font-size:9px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:16px 2px 9px}
 
@@ -194,12 +194,12 @@
     #placementHint.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
     #placementHint strong{font-size:11px}#placementHint small{font-size:9px;color:#b9c9d5;display:block}
     #placementHint button{height:36px;padding:0 12px;border-radius:11px;background:#ef6464;color:#fff;font-size:9px;font-weight:900}
-    #toastZone{position:fixed;z-index:95;left:50%;top:max(90px,calc(var(--safe-t) + 75px));transform:translateX(-50%);display:grid;gap:8px;width:min(360px,calc(100vw - 28px));pointer-events:none}
-    .toast{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(16,32,47,.92);color:#fff;box-shadow:0 16px 35px rgba(0,0,0,.22);backdrop-filter:blur(16px);animation:toastIn .35s both}
+    #toastZone{position:fixed;z-index:95;right:14px;top:max(90px,calc(var(--safe-t) + 75px));display:grid;gap:7px;width:min(330px,calc(100vw - 28px));pointer-events:none}
+    .toast{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(16,32,47,.92);color:#fff;box-shadow:0 14px 30px rgba(0,0,0,.2);backdrop-filter:blur(16px);animation:toastIn .3s both;overflow:hidden}
     .toast.good .toast-dot{background:#3dd59a}.toast.warn .toast-dot{background:#ffb347}
     .toast-dot{width:9px;height:9px;border-radius:50%;background:#65aaff;box-shadow:0 0 0 5px rgba(101,170,255,.13)}
-    .toast div{font-size:10px;line-height:1.4}.toast strong{display:block;font-size:11px}
-    @keyframes toastIn{from{opacity:0;transform:translateY(-12px) scale(.96)}} @keyframes toastOut{to{opacity:0;transform:translateY(-10px)}}
+    .toast div{font-size:10px;line-height:1.35;min-width:0}.toast strong{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    @keyframes toastIn{from{opacity:0;transform:translateX(16px) scale(.97)}} @keyframes toastOut{to{opacity:0;transform:translateX(14px)}}
     .money-float{position:fixed;z-index:60;color:#19a974;font-size:16px;font-weight:900;text-shadow:0 2px 10px #fff;pointer-events:none;animation:moneyUp 1.4s both}
     @keyframes moneyUp{to{transform:translateY(-65px) scale(1.15);opacity:0}}
 
@@ -215,7 +215,7 @@
       .card-grid{gap:8px}.shop-card{min-height:158px}
       .menu-title{letter-spacing:-3px}.menu-content{margin-top:-7vh}.menu-footer,.live-badge{display:none}#menu{align-items:center;background:linear-gradient(180deg,rgba(5,16,28,.46),rgba(5,16,28,.85) 72%);padding:25px}.menu-actions{width:100%}
       .modal{padding:17px;border-radius:23px}input[type=range]{width:90px}.setting-row{padding:9px}
-      #toastZone{top:max(122px,calc(var(--safe-t) + 105px))}
+      #toastZone{top:max(112px,calc(var(--safe-t) + 98px));right:8px;width:min(290px,calc(100vw - 16px));gap:5px}.toast{padding:8px 10px;border-radius:13px}.toast div{font-size:9px}.toast strong{font-size:10px}
     }
     @media(max-width:420px){.stat-icon{display:none}.objective{width:190px}.card-grid{grid-template-columns:1fr 1fr}.menu-title{font-size:52px}.settings-list{gap:7px}}
     @media(max-height:650px) and (orientation:landscape){.objective,.world-status{display:none}.bottom-nav{left:12px;bottom:10px;transform:none;width:auto;flex-direction:column}.nav-btn{width:58px;height:48px}.nav-btn span:not(.badge){display:none}.speed-control{bottom:10px}.topbar{right:8px}.stats-bar{width:auto}.stat{min-width:88px}#panel{top:8px;bottom:8px;height:auto;width:370px;left:80px;border-radius:22px;transform:translateX(-120%)}#panel.show{transform:none}}
@@ -396,25 +396,44 @@
     const icon=id=>'<svg class="icon"><use href="#i-'+id+'"/></svg>';
 
     const BUILDINGS={
-      gate2:{name:["Дополнительный гейт","Extra gate"],desc:["Принимает ещё один самолёт одновременно.","Handles one more aircraft at once."],cost:28000,level:2,icon:"plane",pos:[-3,-9],type:"gate"},
-      garden:{name:["Парк у терминала","Terminal park"],desc:["Украшение повышает настроение пассажиров.","Decoration improves passenger happiness."],cost:18000,level:1,icon:"sun",pos:[25,-43],type:"garden"},
-      parking2:{name:["Большая парковка","Large parking"],desc:["Даёт постоянный доход от посетителей.","Adds steady visitor parking income."],cost:44000,level:3,icon:"road",pos:[48,-54],type:"parking"},
-      roads:{name:["Новая развязка","Road interchange"],desc:["Увеличивает доход парковок и оживляет город.","Boosts parking income and city traffic."],cost:52000,level:3,icon:"road",pos:[0,-62],type:"roads"},
-      gate3:{name:["Третий гейт","Third gate"],desc:["Ещё одно место для обслуживания рейсов.","Another stand for simultaneous flights."],cost:69000,level:3,icon:"plane",pos:[27,-9],type:"gate"},
-      terminal2:{name:["Расширение терминала","Terminal extension"],desc:["Больше пассажиров и заметно крупнее здание.","More passengers and a visibly larger building."],cost:115000,level:4,icon:"terminal",pos:[34,-31],type:"terminal"},
-      fuel:{name:["Топливная станция","Fuel station"],desc:["Снижает расходы и ускоряет подготовку самолётов.","Reduces costs and speeds up turnarounds."],cost:78000,level:4,icon:"up",pos:[67,-4],type:"fuel"},
-      runway2:{name:["Вторая полоса","Second runway"],desc:["Удваивает пропускную способность аэропорта.","Doubles airport flight capacity."],cost:155000,level:5,icon:"flight",pos:[0,53],type:"runway"},
-      tower:{name:["Диспетчерская башня","Control tower"],desc:["Сокращает интервалы между прибывающими рейсами.","Shortens intervals between arriving flights."],cost:112000,level:5,icon:"terminal",pos:[72,-26],type:"tower"},
-      solar:{name:["Солнечный парк","Solar park"],desc:["Снижает обслуживание и красиво светится ночью.","Cuts maintenance and glows beautifully at night."],cost:93000,level:6,icon:"sun",pos:[-65,-47],type:"solar"},
-      hangar:{name:["Сервисный ангар","Service hangar"],desc:["Открывает крупные самолёты и улучшает доход.","Unlocks large aircraft and boosts income."],cost:175000,level:6,icon:"build",pos:[-62,-6],type:"hangar"}
+      garden:{name:["Парк у терминала","Terminal park"],desc:["Повышает настроение пассажиров.","Improves passenger happiness."],cost:18000,level:1,icon:"sun",pos:[25,-43],type:"garden",cat:"service"},
+      gate2:{name:["Дополнительный гейт","Extra gate"],desc:["Принимает ещё один самолёт одновременно.","Handles one more aircraft at once."],cost:32000,level:2,icon:"plane",pos:[-3,-9],type:"gate",cat:"airside"},
+      parking2:{name:["Большая парковка","Large parking"],desc:["Даёт постоянный доход от посетителей.","Adds steady visitor parking income."],cost:52000,level:3,icon:"road",pos:[48,-54],type:"parking",cat:"landside"},
+      roads:{name:["Новая развязка","Road interchange"],desc:["Усиливает доход парковок и оживляет город.","Boosts parking income and city traffic."],cost:68000,level:3,icon:"road",pos:[0,-62],type:"roads",cat:"landside"},
+      gate3:{name:["Третий гейт","Third gate"],desc:["Ещё одно место для обслуживания рейсов.","Another stand for simultaneous flights."],cost:84000,level:4,icon:"plane",pos:[27,-9],type:"gate",cat:"airside"},
+      terminal2:{name:["Расширение терминала","Terminal extension"],desc:["Увеличивает терминал и открывает четвёртый гейт.","Expands the terminal and opens a fourth gate."],cost:145000,level:5,icon:"terminal",pos:[34,-31],type:"terminal",cat:"landside"},
+      fuel:{name:["Топливная станция","Fuel station"],desc:["Снижает расходы и ускоряет подготовку.","Reduces costs and speeds up turnarounds."],cost:105000,level:5,icon:"up",pos:[67,-4],type:"fuel",cat:"airside"},
+      tower:{name:["Диспетчерская башня","Control tower"],desc:["Сокращает интервалы между рейсами.","Shortens intervals between arriving flights."],cost:165000,level:6,icon:"terminal",pos:[72,-26],type:"tower",cat:"airside"},
+      runway2:{name:["Вторая полоса","Second runway"],desc:["Заметно увеличивает пропускную способность.","Greatly increases flight capacity."],cost:240000,level:7,icon:"flight",pos:[0,53],type:"runway",cat:"airside"},
+      solar:{name:["Солнечный парк","Solar park"],desc:["Снижает обслуживание и светится ночью.","Cuts maintenance and glows at night."],cost:150000,level:7,icon:"sun",pos:[-65,-47],type:"solar",cat:"service"},
+      hangar:{name:["Сервисный ангар","Service hangar"],desc:["Открывает крупные самолёты и ремонт на месте.","Unlocks large aircraft and on-site maintenance."],cost:285000,level:8,icon:"build",pos:[-62,-6],type:"hangar",cat:"airside"},
+      fire:{name:["Аварийная служба","Fire & rescue"],desc:["Ускоряет наземные операции и даёт бонус к репутации.","Speeds ground operations and boosts reputation."],cost:210000,level:8,icon:"settings",pos:[90,20],type:"fire",cat:"service"},
+      hotel:{name:["Аэропорт-отель","Airport hotel"],desc:["Приносит доход с пересадочных пассажиров.","Earns income from connecting passengers."],cost:330000,level:9,icon:"terminal",pos:[92,-58],type:"hotel",cat:"landside"},
+      cargoHub:{name:["Грузовой терминал","Cargo terminal"],desc:["Открывает тяжёлые грузовые рейсы.","Unlocks heavy cargo flights."],cost:390000,level:10,icon:"build",pos:[-94,-25],type:"cargo",cat:"airside"},
+      catering:{name:["Бортовое питание","Flight catering"],desc:["Повышает доход и комфорт на каждом рейсе.","Raises revenue and comfort on every flight."],cost:275000,level:10,icon:"star",pos:[-72,-42],type:"catering",cat:"service"},
+      metro:{name:["Станция аэроэкспресса","Airport rail station"],desc:["Увеличивает пассажиропоток и доход наземной зоны.","Boosts passenger flow and landside revenue."],cost:470000,level:11,icon:"road",pos:[-12,-75],type:"metro",cat:"landside"},
+      deicing:{name:["Комплекс антиобледенения","De-icing center"],desc:["Ускоряет оборот самолётов в любую погоду.","Speeds aircraft turnaround in all weather."],cost:360000,level:12,icon:"cloud",pos:[-95,46],type:"deicing",cat:"airside"},
+      vip:{name:["VIP-терминал","VIP terminal"],desc:["Открывает премиальные рейсы и высокий доход.","Unlocks premium flights and high revenue."],cost:520000,level:13,icon:"star",pos:[84,-38],type:"vip",cat:"landside"},
+      satellite:{name:["Спутниковый терминал","Satellite concourse"],desc:["Добавляет сразу два новых гейта.","Adds two new aircraft gates."],cost:720000,level:14,icon:"terminal",pos:[8,-17],type:"satellite",cat:"airside"},
+      radar:{name:["Дальняя РЛС","Long-range radar"],desc:["Рейсы появляются чаще, а табло планирует их точнее.","Flights arrive faster and are scheduled better."],cost:610000,level:15,icon:"flight",pos:[-118,22],type:"radar",cat:"airside"},
+      logistics:{name:["Логистический центр","Logistics center"],desc:["Удваивает бонус грузовых рейсов.","Doubles cargo-flight bonuses."],cost:780000,level:16,icon:"build",pos:[-108,-58],type:"logistics",cat:"service"},
+      runway3:{name:["Третья полоса","Third runway"],desc:["Превращает аэропорт в настоящий мегахаб.","Turns the airport into a true mega-hub."],cost:1100000,level:17,icon:"flight",pos:[0,84],type:"runway",cat:"airside"},
+      terminal3:{name:["Международный терминал","International terminal"],desc:["Открывает дальнемагистральные рейсы и огромный пассажиропоток.","Unlocks long-haul flights and massive passenger flow."],cost:1350000,level:18,icon:"terminal",pos:[-78,126],type:"megaTerminal",cat:"landside"},
+      businessDistrict:{name:["Деловой квартал","Airport business district"],desc:["Даёт крупный постоянный доход и завершает мегапроект.","Adds major passive income and completes the mega-project."],cost:1800000,level:20,icon:"coins",pos:[112,125],type:"district",cat:"landside"}
     };
     const UPGRADES={
-      boarding:{name:["Быстрая посадка","Fast boarding"],desc:["Сокращает время посадки пассажиров.","Reduces passenger boarding time."],base:11500,max:5,icon:"users"},
-      ticket:{name:["Доход с билетов","Ticket revenue"],desc:["+12% дохода с каждого пассажира.","+12% income from every passenger."],base:14000,max:5,icon:"coins"},
-      runway:{name:["Покрытие полосы","Runway surface"],desc:["Быстрее посадка и взлёт самолётов.","Faster aircraft landing and takeoff."],base:17000,max:5,icon:"flight"},
-      maintenance:{name:["Умное обслуживание","Smart maintenance"],desc:["Снижает все регулярные расходы.","Reduces all recurring expenses."],base:15500,max:5,icon:"settings"},
-      happiness:{name:["Комфорт пассажиров","Passenger comfort"],desc:["Больше довольных пассажиров и чаевых.","Improves happiness and bonus income."],base:13000,max:5,icon:"star"},
-      turnaround:{name:["Наземная команда","Ground crew"],desc:["Ускоряет полный оборот самолёта.","Speeds up the full aircraft turnaround."],base:19000,max:5,icon:"up"}
+      boarding:{name:["Быстрая посадка","Fast boarding"],desc:["Сокращает время посадки пассажиров.","Reduces passenger boarding time."],base:15000,max:10,icon:"users"},
+      ticket:{name:["Доход с билетов","Ticket revenue"],desc:["Повышает доход с каждого пассажира.","Raises income from every passenger."],base:18000,max:10,icon:"coins"},
+      runway:{name:["Покрытие полосы","Runway surface"],desc:["Быстрее посадка и взлёт самолётов.","Faster aircraft landing and takeoff."],base:22000,max:10,icon:"flight"},
+      maintenance:{name:["Умное обслуживание","Smart maintenance"],desc:["Снижает все регулярные расходы.","Reduces all recurring expenses."],base:21000,max:10,icon:"settings"},
+      happiness:{name:["Комфорт пассажиров","Passenger comfort"],desc:["Больше довольных пассажиров и чаевых.","Improves happiness and bonus income."],base:17000,max:10,icon:"star"},
+      turnaround:{name:["Наземная команда","Ground crew"],desc:["Ускоряет полный оборот самолёта.","Speeds up the full aircraft turnaround."],base:25000,max:10,icon:"up"},
+      baggage:{name:["Автоматизация багажа","Baggage automation"],desc:["Быстрее разгрузка и меньше задержек у гейтов.","Faster unloading and fewer gate delays."],base:32000,max:8,icon:"build"},
+      security:{name:["Умный досмотр","Smart security"],desc:["Увеличивает пропускную способность терминала.","Increases terminal passenger throughput."],base:36000,max:8,icon:"settings"},
+      retail:{name:["Магазины и рестораны","Retail & dining"],desc:["Дополнительный доход с каждого пассажира.","Adds revenue from every passenger."],base:42000,max:8,icon:"coins"},
+      dispatch:{name:["Цифровая диспетчерская","Digital dispatch"],desc:["Уменьшает интервал между новыми рейсами.","Reduces the interval between new flights."],base:50000,max:8,icon:"flight"},
+      parking:{name:["Умная парковка","Smart parking"],desc:["Повышает регулярный доход наземной зоны.","Raises recurring landside income."],base:38000,max:8,icon:"road"},
+      loyalty:{name:["Программа лояльности","Loyalty program"],desc:["Увеличивает загрузку самолётов и доход.","Improves aircraft load factors and revenue."],base:46000,max:8,icon:"star"}
     };
     const AIRCRAFT=[
       {id:"business",name:["Бизнес-джет","Business jet"],min:1,cap:12,income:5200,scale:.68,color:0xf3f6f8,accent:0x316fe8},
@@ -422,7 +441,10 @@
       {id:"regional",name:["Региональный джет","Regional jet"],min:2,cap:72,income:11200,scale:.92,color:0xffffff,accent:0xff8b35},
       {id:"small",name:["Малый авиалайнер","Small airliner"],min:3,cap:128,income:16600,scale:1.08,color:0xf7f8fb,accent:0x477de0},
       {id:"cargo",name:["Грузовой самолёт","Cargo plane"],min:4,cap:54,income:21800,scale:1.14,color:0xdfe6ea,accent:0xe2a329,cargo:true},
-      {id:"large",name:["Большой авиалайнер","Large airliner"],min:6,cap:240,income:31500,scale:1.35,color:0xf9fbfc,accent:0xb549d9}
+      {id:"large",name:["Большой авиалайнер","Large airliner"],min:6,cap:240,income:31500,scale:1.35,color:0xf9fbfc,accent:0xb549d9},
+      {id:"freighter",name:["Тяжёлый грузовой","Heavy freighter"],min:10,cap:110,income:56000,scale:1.48,color:0xd9e0e4,accent:0xe59b22,cargo:true,requires:"cargoHub"},
+      {id:"premium",name:["Премиальный лайнер","Premium airliner"],min:13,cap:180,income:69000,scale:1.28,color:0xffffff,accent:0xd7af45,requires:"vip"},
+      {id:"longhaul",name:["Дальнемагистральный лайнер","Long-haul airliner"],min:18,cap:360,income:98000,scale:1.58,color:0xf8fbff,accent:0x2767d9,requires:"terminal3"}
     ];
     const AIRLINES=[
       {code:"SKY",name:"SkyWays",color:"#3c7cf1"},{code:"NOVA",name:"Nova Air",color:"#9b4ed1"},
@@ -433,11 +455,11 @@
     const PHASE_EN={approach:"Approach",landing:"Landing",taxiIn:"To gate",turnaround:"Boarding",pushback:"Pushback",taxiOut:"To runway",takeoff:"Takeoff"};
 
     function defaultState(){
-      return {version:4,money:85000,passengers:0,totalPassengers:0,flights:0,level:1,xp:0,day:1,time:480,
+      return {version:5,money:85000,passengers:0,totalPassengers:0,flights:0,level:1,xp:0,day:1,time:480,
         weather:"sunny",happiness:82,totalIncome:0,totalExpenses:0,playSeconds:0,speed:1,lang:"ru",
-        built:{},upgrades:{boarding:0,ticket:0,runway:0,maintenance:0,happiness:0,turnaround:0},
+        built:{},upgrades:{boarding:0,ticket:0,runway:0,maintenance:0,happiness:0,turnaround:0,baggage:0,security:0,retail:0,dispatch:0,parking:0,loyalty:0},
         objective:0,objectiveBase:{flights:0,passengers:0},tutorialDone:false,achievements:{},history:[0,0,0,0,0,0,0,0,0,0],
-        settings:{music:26,sfx:60,quality:innerWidth<700?"medium":"high"},lastSave:Date.now()};
+        settings:{music:26,sfx:60,quality:innerWidth<700?"medium":"high",textureQuality:innerWidth<700?"medium":"high"},lastSave:Date.now()};
     }
 
     class AudioBus{
@@ -510,7 +532,7 @@
       }
       gatePoint(){return new THREE.Vector3(this.game.gates[this.gate].x,1.1,this.game.gates[this.gate].z)}
       setPhase(name){
-        this.phase=name;this.t=0;const gp=this.gatePoint(),rz=this.runway===1?54:22,sp=1-this.game.state.upgrades.runway*.045,turn=(1-this.game.state.upgrades.turnaround*.07-this.game.state.upgrades.boarding*.04)*(this.game.state.built.fuel?.9:1);
+        this.phase=name;this.t=0;const gp=this.gatePoint(),rz=[22,53,84][this.runway]||22,sp=Math.max(.58,1-this.game.state.upgrades.runway*.035),turn=Math.max(.42,1-this.game.state.upgrades.turnaround*.035-this.game.state.upgrades.boarding*.025-this.game.state.upgrades.baggage*.025)*(this.game.state.built.fuel?.9:1)*(this.game.state.built.deicing?.94:1);
         const paths={
           approach:[[-230,62,rz],[-170,28,rz],[-105,7,rz],[-84,2.1,rz]],
           landing:[[-84,2.1,rz],[-62,1.1,rz],[16,1.1,rz],[70,1.1,rz]],
@@ -545,9 +567,9 @@
       }
       setGear(show){for(const w of this.mesh.userData.wheels||[])w.visible=show}
       completeService(){
-        if(this.served)return;this.served=true;const s=this.game.state,load=.72+Math.random()*.27,pass=Math.round(this.type.cap*load);
-        const ticket=1+s.upgrades.ticket*.12,happy=.85+(s.happiness+s.upgrades.happiness*2+(s.built.garden?4:0))/520,income=Math.round(this.type.income*ticket*happy);
-        s.money+=income;s.passengers+=pass;s.totalPassengers+=pass;s.flights++;s.totalIncome+=income;s.xp+=38+Math.round(pass/5);this.game.dailyIncome+=income;
+        if(this.served)return;this.served=true;const s=this.game.state,load=Math.min(.99,.66+Math.random()*.24+s.upgrades.loyalty*.012+(s.built.metro?.04:0)),pass=Math.round(this.type.cap*load*(1+s.upgrades.security*.012));
+        const ticket=1+s.upgrades.ticket*.08+s.upgrades.retail*.035+(s.built.catering?.08:0)+(s.built.vip&&this.type.id==="premium"?.22:0),happy=.86+(s.happiness+s.upgrades.happiness*1.6+(s.built.garden?4:0))/560,cargo=this.type.cargo?(1+(s.built.cargoHub?.22:0)+(s.built.logistics?.42:0)):1,hotel=pass*(s.built.hotel?95:0),income=Math.round(this.type.income*ticket*happy*cargo+hotel);
+        s.money+=income;s.passengers+=pass;s.totalPassengers+=pass;s.flights++;s.totalIncome+=income;s.xp+=18+Math.round(pass/18);this.game.dailyIncome+=income;
         this.game.particles.burst(this.gatePoint().add(new THREE.Vector3(0,2,0)),20,"money");this.game.floatMoney(income);this.game.audio.cash();this.game.toast(tr("Рейс "+this.number+" обслужен","Flight "+this.number+" completed"),tr("+"+money(income)+" · "+pass+" пассажиров","+"+money(income)+" · "+pass+" passengers"),"good");
         this.game.checkProgress();this.game.ui();
       }
@@ -561,8 +583,8 @@
 
     class AirportGame{
       constructor(){
-        this.state=defaultState();this.audio=new AudioBus();this.flights=[];this.clock=new THREE.Clock();this.active=false;this.dailyIncome=0;this.spawnTimer=2;this.economyTimer=0;this.saveTimer=0;this.weatherTimer=50;this.uiTimer=0;this.gameSpeed=1;this.buildMode=null;this.historyTimer=0;this.pointerDown={x:0,y:0};
-        this.gates=[{x:-31,z:-8},{x:-3,z:-8},{x:27,z:-8},{x:49,z:-8}];
+        this.state=defaultState();this.audio=new AudioBus();this.flights=[];this.clock=new THREE.Clock();this.active=false;this.dailyIncome=0;this.spawnTimer=2;this.economyTimer=0;this.saveTimer=0;this.weatherTimer=50;this.uiTimer=0;this.gameSpeed=1;this.buildMode=null;this.historyTimer=0;this.pointerDown={x:0,y:0};this.toastHistory=new Map();this.textureCache={};
+        this.gates=[{x:-31,z:-8},{x:-3,z:-8},{x:27,z:-8},{x:49,z:-8},{x:-54,z:-8},{x:72,z:-8}];
         this.initThree();this.buildWorld();this.particles=new ParticlePool(this.scene);this.passengers=new PassengerPool(this.scene);this.bindUI();this.applyLanguage();this.applyQuality();this.animate();
       }
       initThree(){
@@ -594,32 +616,35 @@
       buildWorld(){
         this.world=new THREE.Group();this.scene.add(this.world);this.dynamicLights=[];this.windowMats=[];this.props=[];
         const skyGeo=new THREE.SphereGeometry(360,32,18),skyMat=new THREE.ShaderMaterial({side:THREE.BackSide,uniforms:{top:{value:new THREE.Color(0x56aaf2)},bottom:{value:new THREE.Color(0xeaf7ff)},night:{value:0}},vertexShader:"varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",fragmentShader:"uniform vec3 top;uniform vec3 bottom;uniform float night;varying vec3 vPos;void main(){float h=normalize(vPos).y*.5+.5;vec3 c=mix(bottom,top,smoothstep(.05,.85,h));c=mix(c,vec3(.018,.035,.075),night);gl_FragColor=vec4(c,1.0);}"});this.skyMat=skyMat;this.mesh(skyGeo,skyMat,this.scene,false);
-        const grassTex=this.makeGrassTexture(),ground=this.mesh(new THREE.PlaneGeometry(300,230),new THREE.MeshStandardMaterial({map:grassTex,color:0x83b86b,roughness:1}),this.world);ground.rotation.x=-Math.PI/2;ground.position.y=-.08;ground.name="ground";
+        const ground=this.mesh(new THREE.PlaneGeometry(360,300),this.surfaceMat("grass",0x83b86b,1),this.world);ground.rotation.x=-Math.PI/2;ground.position.y=-.08;ground.name="ground";
         this.buildRoads();this.addRunway(22,false);this.addTerminal();this.addParking(-35,-52,false);this.addTrees();this.addCity();this.addClouds();this.addRain();this.addVehicles();this.addBaggageCarts();
       }
-      makeGrassTexture(){
-        const c=document.createElement("canvas");c.width=c.height=256;const x=c.getContext("2d");x.fillStyle="#91bd78";x.fillRect(0,0,256,256);
-        for(let i=0;i<4200;i++){const g=110+Math.random()*45;x.fillStyle="rgba("+Math.round(g*.65)+","+Math.round(g)+","+Math.round(g*.52)+",.16)";x.fillRect(Math.random()*256,Math.random()*256,1,1)}
-        const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(12,9);t.colorSpace=THREE.SRGBColorSpace;return t;
+      textureSize(){return({low:128,medium:256,high:512,ultra:1024})[this.state.settings.textureQuality]||256}
+      makeSurfaceTexture(kind){
+        const size=this.textureSize(),key=kind+"-"+size;if(this.textureCache[key])return this.textureCache[key];const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d"),base={grass:"#91bd78",asphalt:"#454c51",concrete:"#a7adb0",roof:"#dce3e7"}[kind]||"#fff";x.fillStyle=base;x.fillRect(0,0,size,size);
+        const grains=Math.round(size*size*(kind==="grass"?.07:.035));for(let i=0;i<grains;i++){const a=.035+Math.random()*.1,v=kind==="grass"?(Math.random()>.5?"42,92,42":"210,230,170"):(Math.random()>.5?"255,255,255":"18,25,30");x.fillStyle="rgba("+v+","+a+")";const q=Math.max(1,size/512);x.fillRect(Math.random()*size,Math.random()*size,q,q)}
+        if(kind==="concrete"){x.strokeStyle="rgba(55,65,72,.16)";x.lineWidth=Math.max(1,size/512);for(let i=0;i<=4;i++){x.beginPath();x.moveTo(i*size/4,0);x.lineTo(i*size/4,size);x.stroke();x.beginPath();x.moveTo(0,i*size/4);x.lineTo(size,i*size/4);x.stroke()}}
+        const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(kind==="grass"?12:kind==="asphalt"?5:3,kind==="grass"?9:3);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=this.renderer?.capabilities?.getMaxAnisotropy?Math.min(8,this.renderer.capabilities.getMaxAnisotropy()):1;this.textureCache[key]=t;return t;
       }
+      surfaceMat(kind,color,rough=.86,metal=.03,extra={}){const m=new THREE.MeshStandardMaterial({color,map:this.makeSurfaceTexture(kind),roughness:rough,metalness:metal,...extra});m.userData.surfaceKind=kind;return m}
       buildRoads(){
-        const asphalt=this.mat(0x37424a,.95),road=this.mesh(new THREE.PlaneGeometry(205,11),asphalt,this.world);road.rotation.x=-Math.PI/2;road.position.set(0,.02,-66);
+        const asphalt=this.surfaceMat("asphalt",0x5b6266,.96),road=this.mesh(new THREE.PlaneGeometry(205,11),asphalt,this.world);road.rotation.x=-Math.PI/2;road.position.set(0,.02,-66);
         for(let x=-96;x<100;x+=11){const l=this.mesh(new THREE.PlaneGeometry(5,.18),this.mat(0xe9e8d7,.7),this.world,false);l.rotation.x=-Math.PI/2;l.position.set(x,.04,-66)}
         const access=this.mesh(new THREE.PlaneGeometry(11,38),asphalt,this.world);access.rotation.x=-Math.PI/2;access.position.set(2,.02,-48);
       }
-      addRunway(z,second){
-        const group=new THREE.Group();group.name=second?"runway2":"runway1";this.world.add(group);
-        const strip=this.mesh(new THREE.PlaneGeometry(190,15),this.mat(0x30373c,.96),group);strip.rotation.x=-Math.PI/2;strip.position.set(0,.015,z);
+      addRunway(z,id="runway1"){
+        const group=new THREE.Group();group.name=typeof id==="string"?id:(id?"runway2":"runway1");this.world.add(group);
+        const strip=this.mesh(new THREE.PlaneGeometry(190,15),this.surfaceMat("asphalt",0x555a5d,.98),group);strip.rotation.x=-Math.PI/2;strip.position.set(0,.015,z);
         for(let x=-80;x<=80;x+=15){const mark=this.mesh(new THREE.PlaneGeometry(7,.38),this.mat(0xf3f1df,.7),group,false);mark.rotation.x=-Math.PI/2;mark.position.set(x,.035,z)}
         for(const x of [-87,-84,-81,81,84,87]){for(const dz of [-3.2,0,3.2]){const m=this.mesh(new THREE.PlaneGeometry(2.1,.35),this.mat(0xffffff,.6),group,false);m.rotation.x=-Math.PI/2;m.position.set(x,.04,z+dz)}}
         const lightMat=new THREE.MeshStandardMaterial({color:0xb9eaff,emissive:0x55bbff,emissiveIntensity:.8});
         for(let x=-92;x<=92;x+=6)for(const dz of [-7.25,7.25]){const l=this.mesh(new THREE.SphereGeometry(.12,6,5),lightMat,group,false);l.position.set(x,.18,z+dz);this.dynamicLights.push(l)}
-        const taxi=this.mesh(new THREE.PlaneGeometry(140,6),this.mat(0x465057,.95),group);taxi.rotation.x=-Math.PI/2;taxi.position.set(-2,.01,z-15);
+        const taxi=this.mesh(new THREE.PlaneGeometry(140,6),this.surfaceMat("asphalt",0x656b6e,.96),group);taxi.rotation.x=-Math.PI/2;taxi.position.set(-2,.01,z-15);
         for(let x=-68;x<68;x+=8){const d=this.mesh(new THREE.PlaneGeometry(2,.16),this.mat(0xf1c94e,.8),group,false);d.rotation.x=-Math.PI/2;d.position.set(x,.04,z-15)}
         group.scale.set(.01,.01,.01);this.popIn(group,.8);
       }
       addTerminal(){
-        const g=new THREE.Group();g.name="terminal";this.world.add(g);const white=this.mat(0xe9eef1,.62,.12),dark=this.mat(0x3d4a54,.55,.35),glass=this.mat(0x68a9c8,.25,.18,{transparent:true,opacity:.78});
+        const g=new THREE.Group();g.name="terminal";this.world.add(g);const white=this.surfaceMat("roof",0xe9eef1,.62,.12),dark=this.surfaceMat("asphalt",0x5a6268,.55,.35),glass=this.mat(0x68a9c8,.25,.18,{transparent:true,opacity:.78});
         const base=this.mesh(new THREE.BoxGeometry(73,8,15),white,g);base.position.set(2,4,-31);
         const roof=this.mesh(new THREE.BoxGeometry(75,1.1,17),dark,g);roof.position.set(2,8.4,-31);
         const windowMat=new THREE.MeshStandardMaterial({color:0x78b4cf,roughness:.22,metalness:.15,emissive:0xffc875,emissiveIntensity:.08,transparent:true,opacity:.82});this.windowMats.push(windowMat);
@@ -627,26 +652,26 @@
         const entry=this.mesh(new THREE.BoxGeometry(12,4,2),glass,g);entry.position.set(2,2.1,-39);
         const sign=this.mesh(new THREE.BoxGeometry(17,1.1,.28),this.mat(0x2b6fe8,.38,.1,{emissive:0x1f66d9,emissiveIntensity:.3}),g,false);sign.position.set(2,7,-22.9);
         for(const gate of this.gates.slice(0,1))this.addJetBridge(gate.x,gate.z);
-        const apron=this.mesh(new THREE.PlaneGeometry(125,26),this.mat(0x8b9397,.92),g);apron.rotation.x=-Math.PI/2;apron.position.set(0,.01,-8);
+        const apron=this.mesh(new THREE.PlaneGeometry(125,26),this.surfaceMat("concrete",0x9ca2a5,.92),g);apron.rotation.x=-Math.PI/2;apron.position.set(0,.01,-8);
         for(const gate of this.gates){const line=this.mesh(new THREE.RingGeometry(4.2,4.38,32,1,0,Math.PI),this.mat(0xf0ca44,.8),g,false);line.rotation.x=-Math.PI/2;line.rotation.z=Math.PI;line.position.set(gate.x,.04,gate.z)}
       }
       addJetBridge(x,z,parent=this.world){
         const g=new THREE.Group();parent.add(g);const body=this.mesh(new THREE.BoxGeometry(8,2.2,2.2),this.mat(0xdce3e7,.7,.18),g);body.position.set(x,3,-20);const pivot=this.mesh(new THREE.CylinderGeometry(1.5,1.5,3.5,12),this.mat(0xaebbc3,.7,.15),g);pivot.position.set(x,1.8,-21);const tunnel=this.mesh(new THREE.BoxGeometry(2.2,2,9),this.mat(0xd9e1e5,.65,.2),g);tunnel.position.set(x,3,-15.5);tunnel.rotation.y=.04;
       }
-      addParking(x,z,big){
-        const g=new THREE.Group();this.world.add(g);const w=big?50:37,d=big?26:22,lot=this.mesh(new THREE.PlaneGeometry(w,d),this.mat(0x444e54,.94),g);lot.rotation.x=-Math.PI/2;lot.position.set(x,.02,z);
+      addParking(x,z,big,name=""){
+        const g=new THREE.Group();g.name=name;this.world.add(g);const w=big?50:37,d=big?26:22,lot=this.mesh(new THREE.PlaneGeometry(w,d),this.surfaceMat("asphalt",0x62696d,.95),g);lot.rotation.x=-Math.PI/2;lot.position.set(x,.02,z);
         const rows=big?6:4;for(let i=0;i<rows;i++){const line=this.mesh(new THREE.PlaneGeometry(.16,d-3),this.mat(0xf2f0dc,.7),g,false);line.rotation.x=-Math.PI/2;line.position.set(x-w/2+5+i*(w-10)/(rows-1),.04,z)}
         for(let i=0;i<(big?14:8);i++){const car=this.makeCar([0x3977d9,0xeceff1,0xe14e55,0x23292d,0xf0ab35][i%5]);car.scale.setScalar(.68);car.position.set(x-w/2+4+(i%rows)*(w-8)/(rows-1),.55,z-d/2+4+Math.floor(i/rows)*8);car.rotation.y=Math.PI/2;g.add(car)}
       }
       addTrees(){
         const trunkGeo=new THREE.CylinderGeometry(.18,.26,1.7,6),leafGeo=new THREE.IcosahedronGeometry(1.25,1),trunkMat=this.mat(0x76563a,1),leafMat=this.mat(0x4f9651,.95);
         const trunks=new THREE.InstancedMesh(trunkGeo,trunkMat,90),leaves=new THREE.InstancedMesh(leafGeo,leafMat,90),dummy=new THREE.Object3D();trunks.castShadow=leaves.castShadow=true;trunks.receiveShadow=leaves.receiveShadow=true;
-        for(let i=0;i<90;i++){let x,z;do{x=-137+Math.random()*274;z=-103+Math.random()*206}while((Math.abs(z-22)<24&&Math.abs(x)<105)||(z<-38&&z>-75&&Math.abs(x)<110)||(z>-25&&z<8&&Math.abs(x)<80));const s=.65+Math.random()*.65;dummy.position.set(x,.85*s,z);dummy.scale.set(s,s,s);dummy.rotation.y=Math.random()*6.28;dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);dummy.position.y=2.35*s;dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix)}
+        for(let i=0;i<90;i++){let x,z,blocked;do{x=-165+Math.random()*330;z=-135+Math.random()*270;blocked=[22,53,84].some(rz=>Math.abs(z-rz)<24&&Math.abs(x)<112)||(z<-36&&z>-78&&Math.abs(x)<116)||(z>-26&&z<10&&Math.abs(x)<90)||Object.values(BUILDINGS).some(b=>Math.abs(x-b.pos[0])<18&&Math.abs(z-b.pos[1])<18)}while(blocked);const s=.65+Math.random()*.65;dummy.position.set(x,.85*s,z);dummy.scale.set(s,s,s);dummy.rotation.y=Math.random()*6.28;dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);dummy.position.y=2.35*s;dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix)}
         this.world.add(trunks,leaves);
       }
       addCity(){
         const mats=[this.mat(0xc8d0d5,.9),this.mat(0xd9cab9,.9),this.mat(0xb9c7d2,.9)];
-        for(let i=0;i<24;i++){const w=6+Math.random()*9,h=5+Math.random()*18,d=5+Math.random()*9,b=this.mesh(new THREE.BoxGeometry(w,h,d),mats[i%3],this.world);b.position.set(-125+Math.random()*250,h/2,90+Math.random()*17)}
+        for(let i=0;i<24;i++){const w=6+Math.random()*9,h=5+Math.random()*18,d=5+Math.random()*9,b=this.mesh(new THREE.BoxGeometry(w,h,d),mats[i%3],this.world);b.position.set(-150+Math.random()*300,h/2,142+Math.random()*8)}
       }
       addClouds(){
         this.clouds=[];const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,transparent:true,opacity:.72,depthWrite:false});
@@ -688,24 +713,35 @@
       }
       popIn(obj,dur=.5){obj.userData.pop={t:0,dur,target:new THREE.Vector3(1,1,1)};obj.scale.setScalar(.01)}
       addExpansion(id){
-        const d=BUILDINGS[id];if(!d)return;const [x,z]=d.pos;if(d.type==="runway"){this.addRunway(z,true);return}const g=new THREE.Group();g.name=id;this.world.add(g);
+        const d=BUILDINGS[id];if(!d)return;const [x,z]=d.pos;if(d.type==="runway"){this.addRunway(z,id);return}const g=new THREE.Group();g.name=id;this.world.add(g);
         if(d.type==="gate"){this.addJetBridge(x,z,g);const mark=this.mesh(new THREE.RingGeometry(4.2,4.38,32,1,0,Math.PI),this.mat(0xf0ca44,.8),g,false);mark.rotation.x=-Math.PI/2;mark.rotation.z=Math.PI;mark.position.set(x,.04,z)}
         if(d.type==="garden"){const pad=this.mesh(new THREE.CylinderGeometry(8,8,.35,28),this.mat(0x83b96f,.95),g);pad.position.set(x,.15,z);for(let i=0;i<9;i++){const crown=this.mesh(new THREE.IcosahedronGeometry(.8+Math.random()*.5,1),this.mat(0x3d9959,.9),g);crown.position.set(x+(Math.random()-.5)*11,1,z+(Math.random()-.5)*9)}const fountain=this.mesh(new THREE.CylinderGeometry(2,2,.7,20),this.mat(0xb7c5cc,.35,.35),g);fountain.position.set(x,.35,z)}
-        if(d.type==="parking")this.addParking(x,z,true);
+        if(d.type==="parking"){this.world.remove(g);this.addParking(x,z,true,id);return}
         if(d.type==="roads"){const fly=this.mesh(new THREE.BoxGeometry(130,.8,8),this.mat(0x3b454b,.9),g);fly.position.set(x,2.2,z);for(let px=-55;px<=55;px+=22){const post=this.mesh(new THREE.BoxGeometry(1,4,1),this.mat(0x9da8ae,.8),g);post.position.set(px,0,z)}}
-        if(d.type==="terminal"){const main=this.mesh(new THREE.BoxGeometry(42,10,17),this.mat(0xe7ecef,.6,.15),g);main.position.set(x,5,z);const glass=this.mat(0x69afcc,.2,.25,{emissive:0xffc56a,emissiveIntensity:.08,transparent:true,opacity:.75});this.windowMats.push(glass);for(let px=x-16;px<=x+16;px+=6){const w=this.mesh(new THREE.BoxGeometry(4,5,.2),glass,g,false);w.position.set(px,5,z+8.6)}}
+        if(d.type==="terminal"){const main=this.mesh(new THREE.BoxGeometry(42,10,17),this.surfaceMat("roof",0xe7ecef,.6,.15),g);main.position.set(x,5,z);const glass=this.mat(0x69afcc,.2,.25,{emissive:0xffc56a,emissiveIntensity:.08,transparent:true,opacity:.75});this.windowMats.push(glass);for(let px=x-16;px<=x+16;px+=6){const w=this.mesh(new THREE.BoxGeometry(4,5,.2),glass,g,false);w.position.set(px,5,z+8.6)}if(id==="terminal2")this.addJetBridge(this.gates[3].x,this.gates[3].z,g)}
         if(d.type==="fuel"){for(let i=0;i<3;i++){const tank=this.mesh(new THREE.CylinderGeometry(2.8,2.8,5.5,18),this.mat(0xe7ecef,.35,.55),g);tank.position.set(x+i*7,2.8,z)}const shed=this.mesh(new THREE.BoxGeometry(24,.5,9),this.mat(0x2874c8,.42,.4),g);shed.position.set(x+7,6,z)}
         if(d.type==="tower"){const base=this.mesh(new THREE.CylinderGeometry(2.2,3.2,18,10),this.mat(0xd4dce0,.65,.2),g);base.position.set(x,9,z);const top=this.mesh(new THREE.CylinderGeometry(5,4,4,10),this.mat(0x4b839a,.2,.45,{transparent:true,opacity:.85}),g);top.position.set(x,19,z);const roof=this.mesh(new THREE.CylinderGeometry(5.5,5.5,.6,10),this.mat(0x303d47,.45,.45),g);roof.position.set(x,21.2,z)}
         if(d.type==="solar"){for(let ix=0;ix<5;ix++)for(let iz=0;iz<3;iz++){const panel=this.mesh(new THREE.BoxGeometry(5,.25,3),this.mat(0x1a4f7a,.18,.7,{emissive:0x0a2a45,emissiveIntensity:.15}),g);panel.position.set(x-12+ix*6,.9,z-5+iz*4);panel.rotation.x=-.25}}
         if(d.type==="hangar"){const hall=this.mesh(new THREE.BoxGeometry(31,11,22),this.mat(0xc8d2d8,.65,.3),g);hall.position.set(x,5.5,z);const door=this.mesh(new THREE.BoxGeometry(18,8,.25),this.mat(0x4b5962,.8,.2),g);door.position.set(x,4,z+11.1)}
+        if(d.type==="fire"){const hall=this.mesh(new THREE.BoxGeometry(25,7,14),this.mat(0xe9edf0,.7,.12),g);hall.position.set(x,3.5,z);for(let i=-1;i<=1;i++){const door=this.mesh(new THREE.BoxGeometry(5,4,.25),this.mat(0xd84b47,.5,.12),g);door.position.set(x+i*7,2,z+7.1)}const truck=this.makeCar(0xd93d3d);truck.position.set(x,0,z+11);truck.scale.setScalar(.7);g.add(truck)}
+        if(d.type==="hotel"){for(let i=0;i<2;i++){const h=18+i*7,b=this.mesh(new THREE.BoxGeometry(15,h,16),this.surfaceMat("roof",i?0xe2e6e8:0xf0ebe4,.65,.12),g);b.position.set(x+(i?8:-7),h/2,z);for(let y=4;y<h;y+=4)for(let px=-5;px<=5;px+=5){const w=this.mesh(new THREE.BoxGeometry(2.5,1.5,.15),this.mat(0x6da3be,.25,.2,{emissive:0xffca75,emissiveIntensity:.18}),g,false);w.position.set(x+(i?8:-7)+px,y,z+8.1);this.windowMats.push(w.material)}}}
+        if(d.type==="cargo"||d.type==="logistics"){const hall=this.mesh(new THREE.BoxGeometry(38,d.type==="cargo"?12:9,24),this.surfaceMat("roof",d.type==="cargo"?0xc9d2d7:0xd7d1c7,.72,.18),g);hall.position.set(x,(d.type==="cargo"?12:9)/2,z);for(let px=-14;px<=14;px+=7){const door=this.mesh(new THREE.BoxGeometry(5,5,.3),this.mat(0x4d5960,.82,.12),g);door.position.set(x+px,2.5,z+12.1)}}
+        if(d.type==="catering"){const hall=this.mesh(new THREE.BoxGeometry(26,8,16),this.mat(0xf0eee8,.75,.08),g);hall.position.set(x,4,z);for(let i=0;i<3;i++){const van=this.makeCar(0xf3a735);van.scale.setScalar(.55);van.position.set(x-8+i*8,.1,z+10);g.add(van)}}
+        if(d.type==="metro"){const pad=this.mesh(new THREE.PlaneGeometry(52,18),this.surfaceMat("concrete",0xbfc5c7,.9),g);pad.rotation.x=-Math.PI/2;pad.position.set(x,.03,z);const roof=this.mesh(new THREE.BoxGeometry(25,1,12),this.mat(0x4a87b8,.28,.38,{transparent:true,opacity:.8}),g);roof.position.set(x,5,z);for(const px of [-10,10]){const post=this.mesh(new THREE.BoxGeometry(1,5,1),this.mat(0x78858d,.5,.45),g);post.position.set(x+px,2.5,z)}}
+        if(d.type==="deicing"){for(let i=0;i<3;i++){const tank=this.mesh(new THREE.CylinderGeometry(2.5,2.5,7,16),this.mat(0xdce7ec,.42,.42),g);tank.position.set(x-8+i*8,3.5,z)}const gantry=this.mesh(new THREE.BoxGeometry(30,1,3),this.mat(0x54a3d8,.5,.3),g);gantry.position.set(x,8,z+6)}
+        if(d.type==="vip"){const hall=this.mesh(new THREE.BoxGeometry(32,8,18),this.surfaceMat("roof",0xf1eee7,.48,.18),g);hall.position.set(x,4,z);const glass=this.mesh(new THREE.BoxGeometry(24,4,.2),this.mat(0x5d9fbe,.18,.3,{emissive:0xffd58a,emissiveIntensity:.15}),g,false);glass.position.set(x,4,z+9.1);this.windowMats.push(glass.material)}
+        if(d.type==="satellite"){const hall=this.mesh(new THREE.BoxGeometry(118,9,16),this.surfaceMat("roof",0xe4e9eb,.62,.16),g);hall.position.set(8,4.5,-17);this.addJetBridge(this.gates[4].x,this.gates[4].z,g);this.addJetBridge(this.gates[5].x,this.gates[5].z,g)}
+        if(d.type==="radar"){const mast=this.mesh(new THREE.CylinderGeometry(.8,1.6,25,10),this.mat(0xd8dde0,.55,.5),g);mast.position.set(x,12.5,z);const dish=this.mesh(new THREE.SphereGeometry(6,20,12,0,Math.PI*2,0,Math.PI/2),this.mat(0xe9eef0,.45,.4,{side:THREE.DoubleSide}),g);dish.position.set(x,25,z);dish.rotation.x=Math.PI/2}
+        if(d.type==="megaTerminal"){const hall=this.mesh(new THREE.BoxGeometry(72,16,28),this.surfaceMat("roof",0xe8ecee,.5,.2),g);hall.position.set(x,8,z);const roof=this.mesh(new THREE.CylinderGeometry(18,18,74,24,1,false,0,Math.PI),this.mat(0x52626d,.38,.45),g);roof.rotation.z=Math.PI/2;roof.position.set(x,15,z);for(let px=-28;px<=28;px+=8){const w=this.mesh(new THREE.BoxGeometry(5,7,.2),this.mat(0x60a7c7,.18,.25,{emissive:0xffcb77,emissiveIntensity:.12}),g,false);w.position.set(x+px,7,z+14.1);this.windowMats.push(w.material)}}
+        if(d.type==="district"){for(let i=0;i<5;i++){const h=18+i*6,b=this.mesh(new THREE.BoxGeometry(10,h,10),this.mat([0x99b5c3,0xb8c6cf,0x7fa4b8][i%3],.32,.45),g);b.position.set(x+(i%2)*13-7,h/2,z+Math.floor(i/2)*13-12)}}
         g.scale.setScalar(.01);this.popIn(g,.65);
       }
       applyLoadedWorld(){for(const id in this.state.built)if(this.state.built[id])this.addExpansion(id)}
-      availableGates(){return 1+(this.state.built.gate2?1:0)+(this.state.built.gate3?1:0)+(this.state.built.terminal2?1:0)}
+      availableGates(){return Math.min(this.gates.length,1+(this.state.built.gate2?1:0)+(this.state.built.gate3?1:0)+(this.state.built.terminal2?1:0)+(this.state.built.satellite?2:0))}
       freeGate(){for(let i=0;i<this.availableGates();i++)if(!this.flights.some(f=>f.gate===i))return i;return-1}
       spawnFlight(force=false){
-        if(!this.active)return;const gate=this.freeGate();if(gate<0)return;const max=this.state.built.runway2?4:3;if(this.flights.length>=max&&!force)return;
-        const types=AIRCRAFT.filter(a=>a.min<=this.state.level&&(a.id!=="large"||this.state.built.hangar));const type=types[Math.floor(Math.random()*types.length)],air=AIRLINES[Math.floor(Math.random()*AIRLINES.length)],runway=this.state.built.runway2&&Math.random()>.52?1:0;
+        if(!this.active)return;const gate=this.freeGate();if(gate<0)return;const runwayCount=1+(this.state.built.runway2?1:0)+(this.state.built.runway3?1:0),max=Math.min(this.availableGates(),2+runwayCount*2);if(this.flights.length>=max&&!force)return;
+        const types=AIRCRAFT.filter(a=>a.min<=this.state.level&&(a.id!=="large"||this.state.built.hangar)&&(!a.requires||this.state.built[a.requires]));const type=types[Math.floor(Math.random()*types.length)],air=AIRLINES[Math.floor(Math.random()*AIRLINES.length)],runway=Math.floor(Math.random()*runwayCount);
         const f=new Flight(this,type,gate,runway,air,100+Math.floor(Math.random()*890));this.flights.push(f);this.updateFlightBoard();this.toast(tr("Новый рейс","New flight"),f.number+" · "+tr(type.name[0],type.name[1]));
       }
       finishFlight(f){const i=this.flights.indexOf(f);if(i>=0)this.flights.splice(i,1);f.dispose();this.updateFlightBoard()}
@@ -714,7 +750,7 @@
         if(!this.flights.length){$("#flightList").innerHTML='<div class="empty-flights">'+tr("Ожидаем следующий рейс…","Waiting for next flight…")+"</div>";return}
         $("#flightList").innerHTML=this.flights.slice(0,4).map(f=>'<div class="flight-row"><span class="airline-logo" style="background:'+f.airline.color+'">'+f.airline.code.slice(0,2)+'</span><span class="flight-info"><strong>'+f.number+'</strong><small>'+tr(f.type.name[0],f.type.name[1])+' · G'+(f.gate+1)+'</small></span><span class="flight-phase">'+(this.state.lang==="en"?PHASE_EN[f.phase]:PHASE_RU[f.phase])+"</span></div>").join("");
       }
-      spawnInterval(){return Math.max(8,17-this.state.level*.7-this.state.upgrades.turnaround*.4-(this.state.built.tower?2.5:0))}
+      spawnInterval(){return Math.max(5.2,19-this.state.level*.32-this.state.upgrades.dispatch*.48-(this.state.built.tower?1.7:0)-(this.state.built.radar?1.8:0))}
       update(dt){
         this.controls.update();this.updateWorld(dt);
         if(!this.active||this.gameSpeed===0){this.particles.update(dt);this.passengers.update(dt);return}
@@ -741,7 +777,7 @@
         $("#menuWeather").textContent=(this.state.weather==="rain"?"Дождь":this.state.weather==="cloudy"?"Облачно":"Ясно")+" · "+this.formatTime();
       }
       expenses(){
-        const s=this.state,parking=Math.round((55+(s.built.parking2?190:0))*(s.built.roads?1.45:1)),base=210+this.flights.length*95+Object.keys(s.built).length*34,reduction=1-s.upgrades.maintenance*.07-(s.built.solar?.1:0)-(s.built.fuel?.06:0),amount=Math.max(90,Math.round(base*reduction));
+        const s=this.state,parking=Math.round((70+(s.built.parking2?260:0)+(s.built.metro?420:0)+(s.built.businessDistrict?1700:0))*(s.built.roads?1.4:1)*(1+s.upgrades.parking*.09)),base=250+this.flights.length*110+Object.keys(s.built).length*48,reduction=Math.max(.34,1-s.upgrades.maintenance*.045-(s.built.solar?.1:0)-(s.built.fuel?.055:0)-(s.built.logistics?.04:0)),amount=Math.max(110,Math.round(base*reduction));
         s.money=Math.max(0,s.money+parking-amount);s.totalIncome+=parking;s.totalExpenses+=amount;this.dailyIncome+=parking;this.checkProgress();
       }
       setWeather(w){if(this.state.weather===w)return;this.state.weather=w;this.rain.visible=w==="rain";this.scene.fog.density=w==="rain"?.006:w==="cloudy"?.0042:.0032;this.toast(tr("Погода изменилась","Weather changed"),w==="rain"?tr("Начался лёгкий дождь","Light rain started"):w==="cloudy"?tr("Стало облачно","Clouds are moving in"):tr("Небо прояснилось","The sky has cleared"))}
@@ -752,10 +788,10 @@
         const names={sunny:[tr("Ясно","Sunny"),"sun"],cloudy:[tr("Облачно","Cloudy"),"cloud"],rain:[tr("Дождь","Rain"),"rain"]},w=names[s.weather];$("#weatherText").textContent=w[0];$("#weatherBadge").innerHTML=icon(w[1]);$("#timeText").textContent=tr("День ","Day ")+s.day+" · "+this.formatTime();
         this.updateObjective();const avail=Object.entries(BUILDINGS).filter(([id,b])=>b.level<=s.level&&!s.built[id]).length;$("#buildBadge").textContent=avail;$("#buildBadge").classList.toggle("hidden",avail===0);
       }
-      xpNeed(level){return 115+level*75}
+      xpNeed(level){return Math.round(260+Math.pow(level,1.55)*92)}
       checkProgress(){
         while(this.state.xp>=this.xpNeed(this.state.level)){this.state.xp-=this.xpNeed(this.state.level);this.state.level++;const bonus=10000+this.state.level*5000;this.state.money+=bonus;this.audio.upgrade();this.confetti();this.toast(tr("Новый уровень "+this.state.level+"!","Airport level "+this.state.level+"!"),tr("Открыты новые возможности · +"+money(bonus),"New options unlocked · +"+money(bonus)),"good");this.unlockAchievement("level"+this.state.level)}
-        this.checkObjective();if(this.state.flights>=1)this.unlockAchievement("firstFlight");if(this.state.totalPassengers>=500)this.unlockAchievement("pass500");if(Object.keys(this.state.built).length>=5)this.unlockAchievement("builder");
+        this.checkObjective();if(this.state.flights>=1)this.unlockAchievement("firstFlight");if(this.state.totalPassengers>=500)this.unlockAchievement("pass500");if(Object.keys(this.state.built).length>=5)this.unlockAchievement("builder");if(this.state.level>=12)this.unlockAchievement("level12");if(this.state.level>=20)this.unlockAchievement("level20");
       }
       objectives(){
         return [
@@ -765,7 +801,18 @@
           {title:["Региональный хаб","Regional hub"],desc:["Достигните 3 уровня аэропорта.","Reach airport level 3."],type:"level",goal:3,reward:26000},
           {title:["Большой поток","Passenger flow"],desc:["Обслужите ещё 8 рейсов.","Complete 8 more flights."],type:"flightsDelta",goal:8,reward:35000},
           {title:["Международный статус","International status"],desc:["Постройте расширение терминала.","Build the terminal extension."],type:"building",id:"terminal2",goal:1,reward:50000},
-          {title:["Аэропорт мирового класса","World-class airport"],desc:["Достигните 7 уровня. Развитие продолжится без ограничений.","Reach level 7. Free play continues afterwards."],type:"level",goal:7,reward:100000}
+          {title:["Аэропорт мирового класса","World-class airport"],desc:["Достигните 7 уровня.","Reach airport level 7."],type:"level",goal:7,reward:100000},
+          {title:["Полоса для роста","Runway for growth"],desc:["Постройте вторую взлётно-посадочную полосу.","Build the second runway."],type:"building",id:"runway2",goal:1,reward:140000},
+          {title:["Тяжёлая авиация","Heavy aviation"],desc:["Постройте сервисный ангар.","Build the service hangar."],type:"building",id:"hangar",goal:1,reward:175000},
+          {title:["Пять тысяч пассажиров","Five thousand passengers"],desc:["Обслужите 5 000 пассажиров за всё время.","Serve 5,000 passengers in total."],type:"passengers",goal:5000,reward:220000},
+          {title:["Грузы без границ","Cargo without borders"],desc:["Откройте грузовой терминал.","Open the cargo terminal."],type:"building",id:"cargoHub",goal:1,reward:280000},
+          {title:["Большой транспортный узел","Major transport hub"],desc:["Достигните 12 уровня аэропорта.","Reach airport level 12."],type:"level",goal:12,reward:320000},
+          {title:["Премиальное направление","Premium destination"],desc:["Постройте VIP-терминал.","Build the VIP terminal."],type:"building",id:"vip",goal:1,reward:380000},
+          {title:["Шесть гейтов","Six gates"],desc:["Постройте спутниковый терминал.","Build the satellite concourse."],type:"building",id:"satellite",goal:1,reward:480000},
+          {title:["Сотни вылетов","Hundreds of departures"],desc:["Обслужите ещё 80 рейсов.","Complete 80 more flights."],type:"flightsDelta",goal:80,reward:540000},
+          {title:["Мегахаб","Mega-hub"],desc:["Постройте третью полосу.","Build the third runway."],type:"building",id:"runway3",goal:1,reward:750000},
+          {title:["Межконтинентальные маршруты","Intercontinental routes"],desc:["Откройте международный терминал.","Open the international terminal."],type:"building",id:"terminal3",goal:1,reward:900000},
+          {title:["Аэротрополис","Aerotropolis"],desc:["Достигните 20 уровня и постройте деловой квартал.","Reach level 20 and build the business district."],type:"building",id:"businessDistrict",goal:1,reward:1500000}
         ];
       }
       objectiveProgress(o){
@@ -778,8 +825,8 @@
         const list=this.objectives();if(this.state.objective>=list.length)return;const o=list[this.state.objective];if(this.objectiveProgress(o)<o.goal)return;
         this.state.money+=o.reward;this.audio.upgrade();this.confetti();this.toast(tr("Цель выполнена!","Objective complete!"),"+"+money(o.reward),"good");this.state.objective++;this.state.objectiveBase={flights:this.state.flights,passengers:this.state.totalPassengers};
       }
-      unlockAchievement(id){if(this.state.achievements[id])return;this.state.achievements[id]=true;if(["firstFlight","pass500","builder","level5","level7"].includes(id))this.toast(tr("Новое достижение","Achievement unlocked"),this.achievementName(id),"good")}
-      achievementName(id){const n={firstFlight:["Первый взлёт","First takeoff"],pass500:["Народный аэропорт","People mover"],builder:["Архитектор","Architect"],level5:["Большой хаб","Major hub"],level7:["Мировой класс","World class"]};return tr(...(n[id]||["Новая высота","New height"]))}
+      unlockAchievement(id){if(this.state.achievements[id])return;this.state.achievements[id]=true;if(["firstFlight","pass500","builder","level5","level7","level12","level20"].includes(id))this.toast(tr("Новое достижение","Achievement unlocked"),this.achievementName(id),"good")}
+      achievementName(id){const n={firstFlight:["Первый взлёт","First takeoff"],pass500:["Народный аэропорт","People mover"],builder:["Архитектор","Architect"],level5:["Большой хаб","Major hub"],level7:["Мировой класс","World class"],level12:["Транспортный узел","Transport nexus"],level20:["Аэротрополис","Aerotropolis"]};return tr(...(n[id]||["Новая высота","New height"]))}
       start(load){
         this.audio.start();this.closeModal();this.closePanel();$("#menu").classList.add("hidden-menu");$("#gameUI").classList.remove("hidden");this.active=true;
         if(load){const data=this.readSave();if(data){this.state={...defaultState(),...data,settings:{...defaultState().settings,...data.settings},upgrades:{...defaultState().upgrades,...data.upgrades},built:data.built||{},achievements:data.achievements||{}};this.applyLoadedWorld();const mins=Math.min(120,Math.floor((Date.now()-(data.lastSave||Date.now()))/60000));if(mins>1){const offline=Math.min(75000,mins*(90+this.state.level*25));this.state.money+=offline;this.toast(tr("С возвращением!","Welcome back!"),tr("Доход за время отсутствия: ","Offline income: ")+money(offline),"good")}}}
@@ -807,11 +854,11 @@
         const m=meta[type];$("#panelIcon").innerHTML=icon(m[0]);$("#panelTitle").textContent=m[1];$("#panelSub").textContent=m[2];if(type==="build")this.renderBuild();if(type==="upgrade")this.renderUpgrades();if(type==="stats")this.renderStats();
       }
       closePanel(){$("#panel").classList.remove("show");$("#scrim").classList.remove("show");$$(".nav-btn").forEach(b=>b.classList.remove("active"))}
-      renderBuild(){
-        $("#panelBody").innerHTML='<div class="panel-tabs"><button class="active">'+tr("Объекты","Facilities")+'</button><button id="focusAirport">'+tr("Показать аэропорт","View airport")+'</button></div><div class="card-grid">'+Object.entries(BUILDINGS).map(([id,b])=>{
+      renderBuild(cat=this.buildCategory||"all"){
+        this.buildCategory=cat;const tabs=[["all","Все","All"],["airside","Аэродром","Airfield"],["landside","Терминалы","Terminals"],["service","Сервисы","Services"]];$("#panelBody").innerHTML='<div class="panel-tabs">'+tabs.map(t=>'<button data-build-cat="'+t[0]+'" class="'+(cat===t[0]?"active":"")+'">'+tr(t[1],t[2])+'</button>').join("")+'</div><div class="card-grid">'+Object.entries(BUILDINGS).filter(([,b])=>cat==="all"||b.cat===cat).map(([id,b])=>{
           const built=!!this.state.built[id],locked=this.state.level<b.level,price=money(b.cost);return '<article class="shop-card '+(built?"built ":locked?"locked ":"")+'"><span class="shop-icon">'+icon(b.icon)+'</span>'+(built?'<i class="built-mark">'+icon("check")+"</i>":"")+'<h3>'+tr(b.name[0],b.name[1])+'</h3><p>'+tr(b.desc[0],b.desc[1])+'</p><div class="shop-action"><span class="price '+(locked?"lock":"")+'">'+(built?tr("Построено","Built"):locked?tr("Уровень ","Level ")+b.level:price)+'</span><button class="mini-buy" data-build="'+id+'" '+(built||locked?"disabled":"")+'>'+ (built?tr("Готово","Done"):tr("Выбрать","Select"))+'</button></div></article>'
         }).join("")+'</div>';
-        $$("[data-build]").forEach(b=>b.onclick=()=>this.beginPlacement(b.dataset.build));$("#focusAirport").onclick=()=>{this.cameraHome();this.closePanel()};
+        $$("[data-build]").forEach(b=>b.onclick=()=>this.beginPlacement(b.dataset.build));$$("[data-build-cat]").forEach(b=>b.onclick=()=>this.renderBuild(b.dataset.buildCat));
       }
       beginPlacement(id){
         const b=BUILDINGS[id];if(this.state.money<b.cost){this.toast(tr("Недостаточно средств","Not enough funds"),tr("Нужно ещё ","You need ")+money(b.cost-this.state.money),"warn");this.audio.tone(170,.2,"square",.05);return}
@@ -822,34 +869,36 @@
       cancelPlacement(){this.buildMode=null;$("#placementHint").classList.remove("show");if(this.ghost){this.scene.remove(this.ghost);this.ghost=null}}
       confirmPlacement(){
         const id=this.buildMode,b=BUILDINGS[id];if(!id||!b)return;if(this.state.money<b.cost){this.cancelPlacement();return}
-        this.state.money-=b.cost;this.state.totalExpenses+=b.cost;this.state.built[id]=true;this.state.xp+=50;this.addExpansion(id);this.cancelPlacement();this.particles.burst(new THREE.Vector3(b.pos[0],3,b.pos[1]),35,"spark");this.confetti();this.audio.upgrade();this.toast(tr("Построено!","Built!"),tr(b.name[0],b.name[1])+" · -"+money(b.cost),"good");this.checkProgress();this.checkObjective();this.ui();this.save(false);this.cameraHome();
+        this.state.money-=b.cost;this.state.totalExpenses+=b.cost;this.state.built[id]=true;this.state.xp+=90+this.state.level*8;this.addExpansion(id);this.cancelPlacement();this.particles.burst(new THREE.Vector3(b.pos[0],3,b.pos[1]),35,"spark");this.confetti();this.audio.upgrade();this.toast(tr("Построено!","Built!"),tr(b.name[0],b.name[1])+" · -"+money(b.cost),"good");this.checkProgress();this.checkObjective();this.ui();this.save(false);this.cameraHome();
       }
-      renderUpgrades(){
-        $("#panelBody").innerHTML='<div class="card-grid">'+Object.entries(UPGRADES).map(([id,u])=>{const lv=this.state.upgrades[id],max=lv>=u.max,cost=Math.round(u.base*Math.pow(1.62,lv));return '<article class="shop-card '+(max?"built":"")+'"><span class="shop-icon">'+icon(u.icon)+'</span><h3>'+tr(u.name[0],u.name[1])+'</h3><p>'+tr(u.desc[0],u.desc[1])+'</p><div class="level-dots">'+Array.from({length:u.max},(_,i)=>'<i class="'+(i<lv?"on":"")+'"></i>').join("")+'</div><div class="shop-action"><span class="price">'+(max?tr("Максимум","Maximum"):money(cost))+'</span><button class="mini-buy" data-upgrade="'+id+'" '+(max?"disabled":"")+'>'+tr("Улучшить","Upgrade")+'</button></div></article>'}).join("")+"</div>";
+      renderUpgrades(cat=this.upgradeCategory||"core"){
+        this.upgradeCategory=cat;const core=new Set(["boarding","ticket","runway","maintenance","happiness","turnaround"]),items=Object.entries(UPGRADES).filter(([id])=>cat==="all"||(cat==="core"?core.has(id):!core.has(id)));$("#panelBody").innerHTML='<div class="panel-tabs"><button data-up-cat="core" class="'+(cat==="core"?"active":"")+'">'+tr("Основные","Core")+'</button><button data-up-cat="advanced" class="'+(cat==="advanced"?"active":"")+'">'+tr("Системы","Systems")+'</button><button data-up-cat="all" class="'+(cat==="all"?"active":"")+'">'+tr("Все","All")+'</button></div><div class="card-grid">'+items.map(([id,u])=>{const lv=this.state.upgrades[id],max=lv>=u.max,cost=Math.round(u.base*Math.pow(1.48,lv));return '<article class="shop-card '+(max?"built":"")+'"><span class="shop-icon">'+icon(u.icon)+'</span><h3>'+tr(u.name[0],u.name[1])+'</h3><p>'+tr(u.desc[0],u.desc[1])+'</p><div class="level-dots">'+Array.from({length:u.max},(_,i)=>'<i class="'+(i<lv?"on":"")+'"></i>').join("")+'</div><div class="shop-action"><span class="price">'+(max?tr("Максимум","Maximum"):money(cost))+'</span><button class="mini-buy" data-upgrade="'+id+'" '+(max?"disabled":"")+'>'+tr("Улучшить","Upgrade")+'</button></div></article>'}).join("")+"</div>";
         $$("[data-upgrade]").forEach(b=>b.onclick=()=>this.buyUpgrade(b.dataset.upgrade));
+        $$("[data-up-cat]").forEach(b=>b.onclick=()=>this.renderUpgrades(b.dataset.upCat));
       }
       buyUpgrade(id){
-        const u=UPGRADES[id],lv=this.state.upgrades[id],cost=Math.round(u.base*Math.pow(1.62,lv));if(lv>=u.max)return;if(this.state.money<cost){this.toast(tr("Недостаточно средств","Not enough funds"),tr("Нужно ещё ","You need ")+money(cost-this.state.money),"warn");return}
-        this.state.money-=cost;this.state.totalExpenses+=cost;this.state.upgrades[id]++;this.state.xp+=30;this.audio.upgrade();this.confetti();this.toast(tr("Улучшение установлено","Upgrade installed"),tr(u.name[0],u.name[1])+" · "+tr("уровень ","level ")+(lv+1),"good");this.checkProgress();this.ui();this.renderUpgrades();this.save(false);
+        const u=UPGRADES[id],lv=this.state.upgrades[id],cost=Math.round(u.base*Math.pow(1.48,lv));if(lv>=u.max)return;if(this.state.money<cost){this.toast(tr("Недостаточно средств","Not enough funds"),tr("Нужно ещё ","You need ")+money(cost-this.state.money),"warn");return}
+        this.state.money-=cost;this.state.totalExpenses+=cost;this.state.upgrades[id]++;this.state.xp+=45+this.state.level*3;this.audio.upgrade();this.confetti();this.toast(tr("Улучшение установлено","Upgrade installed"),tr(u.name[0],u.name[1])+" · "+tr("уровень ","level ")+(lv+1),"good");this.checkProgress();this.ui();this.renderUpgrades();this.save(false);
       }
       renderStats(){
-        const s=this.state,profit=s.totalIncome-s.totalExpenses,avg=s.flights?Math.round(s.totalPassengers/s.flights):0,play=Math.floor(s.playSeconds/60),ach=["firstFlight","pass500","builder","level5","level7"];
+        const s=this.state,profit=s.totalIncome-s.totalExpenses,avg=s.flights?Math.round(s.totalPassengers/s.flights):0,play=Math.floor(s.playSeconds/60),ach=["firstFlight","pass500","builder","level5","level7","level12","level20"];
         $("#panelBody").innerHTML='<div class="stat-hero"><div class="stat-hero-head"><div><h3>'+tr("Общий доход","Total revenue")+'</h3><strong>'+money(s.totalIncome)+'</strong></div><span class="trend">'+(profit>=0?"+":"")+money(profit)+'</span></div>'+this.sparkline()+'</div><div class="metric-grid"><div class="metric"><small>'+tr("Всего пассажиров","Total passengers")+'</small><strong>'+fmt(s.totalPassengers)+'</strong></div><div class="metric"><small>'+tr("Среднее на рейс","Average per flight")+'</small><strong>'+avg+'</strong></div><div class="metric"><small>'+tr("Счастье","Happiness")+'</small><strong>'+Math.round(s.happiness+s.upgrades.happiness*2+(s.built.garden?4:0))+'%</strong></div><div class="metric"><small>'+tr("Время управления","Play time")+'</small><strong>'+play+' '+tr("мин","min")+'</strong></div></div><div class="section-label">'+tr("Достижения","Achievements")+'</div>'+ach.map(id=>'<div class="achievement '+(s.achievements[id]?"":"locked")+'"><span class="achievement-icon">'+icon(s.achievements[id]?"trophy":"lock")+'</span><span><strong>'+this.achievementName(id)+'</strong><small>'+this.achievementDesc(id)+'</small></span></div>').join("");
       }
       sparkline(){
         const a=this.state.history.length?this.state.history:[0],max=Math.max(1,...a),pts=a.map((v,i)=>(i/(a.length-1||1)*320)+","+(64-v/max*54)).join(" ");
         return '<svg id="sparkline" viewBox="0 0 320 70" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a94fa" stop-opacity=".3"/><stop offset="1" stop-color="#4a94fa" stop-opacity="0"/></linearGradient></defs><path d="M0,70 L'+pts.replace(/ /g," L")+' L320,70 Z" fill="url(#sg)"/><polyline points="'+pts+'" fill="none" stroke="#3478f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       }
-      achievementDesc(id){const d={firstFlight:["Обслужить первый рейс","Complete the first flight"],pass500:["Перевезти 500 пассажиров","Serve 500 passengers"],builder:["Построить 5 объектов","Build 5 facilities"],level5:["Достичь 5 уровня","Reach level 5"],level7:["Достичь 7 уровня","Reach level 7"]};return tr(...(d[id]||["Продолжайте развиваться","Keep growing"]))}
+      achievementDesc(id){const d={firstFlight:["Обслужить первый рейс","Complete the first flight"],pass500:["Перевезти 500 пассажиров","Serve 500 passengers"],builder:["Построить 5 объектов","Build 5 facilities"],level5:["Достичь 5 уровня","Reach level 5"],level7:["Достичь 7 уровня","Reach level 7"],level12:["Достичь 12 уровня","Reach level 12"],level20:["Достичь 20 уровня","Reach level 20"]};return tr(...(d[id]||["Продолжайте развиваться","Keep growing"]))}
       openSettings(){
         this.audio.click();const s=this.state.settings;$("#modal").innerHTML='<div class="modal-top"><h2>'+tr("Настройки","Settings")+'</h2><button class="modal-close">'+icon("x")+'</button></div><div class="settings-list">'+
           this.settingRow("volume",tr("Музыка","Music"),tr("Фоновая атмосфера аэропорта","Airport background ambience"),'<input id="musicRange" type="range" min="0" max="100" value="'+s.music+'">')+
           this.settingRow("volume",tr("Эффекты","Sound effects"),tr("Самолёты, касса и интерфейс","Aircraft, cash and interface"),'<input id="sfxRange" type="range" min="0" max="100" value="'+s.sfx+'">')+
           this.settingRow("settings",tr("Графика","Graphics"),tr("Качество теней и свечения","Shadow and glow quality"),'<select id="qualitySelect"><option value="low" '+(s.quality==="low"?"selected":"")+'>'+tr("Низкая","Low")+'</option><option value="medium" '+(s.quality==="medium"?"selected":"")+'>'+tr("Средняя","Medium")+'</option><option value="high" '+(s.quality==="high"?"selected":"")+'>'+tr("Высокая","High")+'</option></select>')+
+          this.settingRow("build",tr("Качество текстур","Texture quality"),tr("Детализация травы, бетона, дорог и полос","Detail of grass, concrete, roads and runways"),'<select id="textureSelect"><option value="low" '+(s.textureQuality==="low"?"selected":"")+'>'+tr("Низкое","Low")+'</option><option value="medium" '+(s.textureQuality==="medium"?"selected":"")+'>'+tr("Среднее","Medium")+'</option><option value="high" '+(s.textureQuality==="high"?"selected":"")+'>'+tr("Высокое","High")+'</option><option value="ultra" '+(s.textureQuality==="ultra"?"selected":"")+'>'+tr("Ультра","Ultra")+'</option></select>')+
           this.settingRow("info",tr("Язык","Language"),tr("Язык игрового интерфейса","Game interface language"),'<select id="langSelect"><option value="ru" '+(this.state.lang==="ru"?"selected":"")+'>Русский</option><option value="en" '+(this.state.lang==="en"?"selected":"")+'>English</option></select>')+
           this.settingRow("full",tr("Полный экран","Fullscreen"),tr("Скрыть интерфейс браузера, если доступно","Hide browser UI where supported"),'<button id="settingsFull" class="mini-buy">'+tr("Открыть","Open")+'</button>')+
           '</div><button id="resetSave" class="danger">'+icon("x")+tr("Сбросить весь прогресс","Reset all progress")+'</button>';this.showModal();$(".modal-close").onclick=()=>this.closeModal();
-        $("#musicRange").oninput=e=>{s.music=+e.target.value;this.audio.update();this.savePrefs()};$("#sfxRange").oninput=e=>{s.sfx=+e.target.value;this.savePrefs()};$("#qualitySelect").onchange=e=>{s.quality=e.target.value;this.applyQuality();this.savePrefs()};$("#langSelect").onchange=e=>{this.state.lang=e.target.value;this.applyLanguage();this.closeModal();this.ui();this.updateFlightBoard();this.toast(tr("Язык изменён","Language changed"),tr("Интерфейс обновлён","Interface updated"),"good");this.savePrefs();this.save(false)};$("#settingsFull").onclick=()=>this.fullscreen();$("#resetSave").onclick=()=>this.confirmReset();
+        $("#musicRange").oninput=e=>{s.music=+e.target.value;this.audio.update();this.savePrefs()};$("#sfxRange").oninput=e=>{s.sfx=+e.target.value;this.savePrefs()};$("#qualitySelect").onchange=e=>{s.quality=e.target.value;this.applyQuality();this.savePrefs()};$("#textureSelect").onchange=e=>{s.textureQuality=e.target.value;this.applyTextureQuality();this.savePrefs();this.toast(tr("Текстуры обновлены","Textures updated"),tr("Новое качество применено сразу","New quality applied instantly"),"good")};$("#langSelect").onchange=e=>{this.state.lang=e.target.value;this.applyLanguage();this.closeModal();this.ui();this.updateFlightBoard();this.toast(tr("Язык изменён","Language changed"),tr("Интерфейс обновлён","Interface updated"),"good");this.savePrefs();this.save(false)};$("#settingsFull").onclick=()=>this.fullscreen();$("#resetSave").onclick=()=>this.confirmReset();
       }
       settingRow(ic,title,sub,control){return '<div class="setting-row"><span class="icon-wrap">'+icon(ic)+'</span><span class="setting-text"><strong>'+title+'</strong><small>'+sub+'</small></span>'+control+"</div>"}
       openAbout(){
@@ -883,8 +932,9 @@
       savePrefs(){try{localStorage.setItem(PREF_KEY,JSON.stringify({...this.state.settings,lang:this.state.lang}))}catch(e){}}
       loadPrefs(){try{const p=JSON.parse(localStorage.getItem(PREF_KEY));if(p){const {lang,...settings}=p;this.state.settings={...this.state.settings,...settings};if(lang)this.state.lang=lang}}catch(e){}}
       applyQuality(){
-        const q=this.state.settings.quality,ratio=q==="low"?1:q==="medium"?Math.min(devicePixelRatio,1.35):Math.min(devicePixelRatio,1.8);this.renderer.setPixelRatio(ratio);this.renderer.shadowMap.enabled=q!=="low";this.bloom.enabled=q==="high";this.resize();
+        const q=this.state.settings.quality,ratio=q==="low"?1:q==="medium"?Math.min(devicePixelRatio,1.35):Math.min(devicePixelRatio,1.8);this.renderer.setPixelRatio(ratio);this.renderer.shadowMap.enabled=q!=="low";this.bloom.enabled=q==="high";this.applyTextureQuality();this.resize();
       }
+      applyTextureQuality(){if(!this.world)return;this.world.traverse(o=>{if(!o.isMesh)return;const mats=Array.isArray(o.material)?o.material:[o.material];for(const m of mats){const kind=m?.userData?.surfaceKind;if(kind){m.map=this.makeSurfaceTexture(kind);m.needsUpdate=true}}})}
       showModalMessage(title,text){$("#modal").innerHTML='<div class="modal-top"><h2>'+title+'</h2><button class="modal-close">'+icon("x")+'</button></div><p style="font-size:12px;color:var(--muted);line-height:1.6">'+text+"</p>";this.showModal();$(".modal-close").onclick=()=>this.closeModal()}
       fullscreen(){
         const el=document.documentElement;if(!document.fullscreenElement){const p=el.requestFullscreen?.()||el.webkitRequestFullscreen?.();if(p?.catch)p.catch(()=>this.toast(tr("Полный экран недоступен","Fullscreen unavailable"),tr("Добавьте страницу на главный экран","Add the page to your home screen"),"warn"))}else(document.exitFullscreen||document.webkitExitFullscreen)?.call(document);this.audio.click();
@@ -906,7 +956,7 @@
         const d=document.createElement("div");d.className="money-float";d.textContent="+"+money(amount);d.style.left=(innerWidth*.5+(Math.random()-.5)*120)+"px";d.style.top=(innerHeight*.45)+"px";document.body.appendChild(d);setTimeout(()=>d.remove(),1500)
       }
       toast(title,detail="",kind=""){
-        const d=document.createElement("div");d.className="toast "+kind;d.innerHTML='<i class="toast-dot"></i><div><strong>'+title+'</strong>'+detail+"</div>";$("#toastZone").appendChild(d);setTimeout(()=>{d.style.animation="toastOut .3s both";setTimeout(()=>d.remove(),300)},3200)
+        const zone=$("#toastZone"),now=Date.now(),last=this.toastHistory.get(title)||0;if(now-last<900)return;this.toastHistory.set(title,now);const max=innerWidth<=800?1:2;while(zone.children.length>=max)zone.firstElementChild?.remove();const d=document.createElement("div");d.className="toast "+kind;d.innerHTML='<i class="toast-dot"></i><div><strong>'+title+'</strong>'+detail+"</div>";zone.appendChild(d);setTimeout(()=>{if(!d.isConnected)return;d.style.animation="toastOut .25s both";setTimeout(()=>d.remove(),250)},innerWidth<=800?2100:2700)
       }
       confetti(){this.particles.burst(this.controls.target.clone().add(new THREE.Vector3(0,10,0)),42,"spark")}
       resize(){const w=innerWidth,h=innerHeight;this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.renderer.setSize(w,h);this.composer.setSize(w,h)}
