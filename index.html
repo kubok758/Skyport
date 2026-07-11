@@ -167,11 +167,11 @@ button{color:inherit}
 </div>
 
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/OrbitControls.js';
-import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/+esm';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/OrbitControls.js/+esm';
+import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/EffectComposer.js/+esm';
+import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/RenderPass.js/+esm';
+import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/UnrealBloomPass.js/+esm';
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -182,6 +182,17 @@ const fmt=n=>new Intl.NumberFormat(state.settings.language==='ru'?'ru-RU':'en-US
 const money=n=>`${state.settings.language==='ru'?'$':'$'}${fmt(n)}`;
 const SAVE_KEY='skyport_tycoon_save_v1';
 const SETTINGS_KEY='skyport_tycoon_settings_v1';
+const showFatalError=(message)=>{
+  const loading=document.getElementById('loading');
+  const tip=document.getElementById('loadingTip');
+  const bar=document.getElementById('progressBar');
+  if(bar) bar.style.width='100%';
+  if(tip) tip.innerHTML=`<strong>Loading error.</strong><br>${message}<br><br>Try reloading the page. If it still fails, clear cache or open the newest file.`;
+  if(loading) loading.classList.remove('done');
+};
+window.addEventListener('error',e=>{ console.error(e.error||e.message); showFatalError((e.error&&e.error.message)||e.message||'Unknown error'); });
+window.addEventListener('unhandledrejection',e=>{ console.error(e.reason); showFatalError((e.reason&&e.reason.message)||String(e.reason)||'Unknown promise error'); });
+
 const tips=[
   'Faster turnaround means more flights and more income.',
   'Parking earns steady passive income from every passenger.',
@@ -509,7 +520,7 @@ async function boot(){
   bindUI();let p=0;const tip=$('#loadingTip');const timer=setInterval(()=>{p=Math.min(94,p+5+Math.random()*9);$('#progressBar').style.width=`${p}%`;tip.textContent=tips[Math.floor(Math.random()*tips.length)]},210);
   initThree();const hasSave=loadState();$('#continueBtn').disabled=!hasSave;syncSettingsUI();applyLanguage();applyBuiltState();updateUI();animate();await new Promise(r=>setTimeout(r,1650));clearInterval(timer);$('#progressBar').style.width='100%';tip.textContent='Airport ready for operations.';setTimeout(()=>$('#loading').classList.add('done'),360)
 }
-boot();
+boot().catch(err=>{console.error(err); showFatalError(err?.message||String(err));});
 </script>
 </body>
 </html>
