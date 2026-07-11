@@ -1,526 +1,942 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<meta name="theme-color" content="#081525" />
-<title>Skyport — Airport Tycoon</title>
-<style>
-:root{
-  --bg:#07111f;--panel:rgba(12,25,43,.74);--panel-strong:rgba(10,22,38,.92);
-  --line:rgba(255,255,255,.12);--text:#f5f9ff;--muted:#9fb1c7;
-  --accent:#52c9ff;--accent2:#7effa8;--warn:#ffd266;--danger:#ff768c;
-  --shadow:0 18px 55px rgba(0,0,0,.35);--radius:22px;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select{font:inherit}
-button{color:inherit}
-#app,#world{position:fixed;inset:0}
-#world canvas{display:block;width:100%;height:100%;touch-action:none}
-.hidden{display:none!important}
-.glass{background:var(--panel);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid var(--line);box-shadow:var(--shadow)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#0d1722">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Airport Tycoon 2026</title>
+  <style>
+    :root {
+      --ink:#14202c; --muted:#667686; --paper:#f7fafc; --panel:rgba(255,255,255,.86);
+      --line:rgba(33,51,69,.12); --blue:#3478f6; --blue2:#5ca8ff; --green:#19b57b;
+      --orange:#ff9f43; --red:#ef5b5b; --night:#0b1420; --shadow:0 18px 60px rgba(7,22,39,.22);
+      --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0d1722;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    button,input,select{font:inherit}
+    button{border:0;cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(52,120,246,.4);outline-offset:2px}
+    svg.icon{width:21px;height:21px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .hidden{display:none!important}
+    #app,#scene{position:fixed;inset:0}
+    #scene{touch-action:none;background:linear-gradient(#8fcfff,#e5f4ff)}
+    #scene canvas{display:block;width:100%;height:100%}
+    .glass{background:var(--panel);border:1px solid rgba(255,255,255,.62);box-shadow:var(--shadow);backdrop-filter:blur(22px) saturate(1.15);-webkit-backdrop-filter:blur(22px) saturate(1.15)}
 
-/* Loading */
-#loading{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#173c61 0,#0b1c31 35%,#050c15 100%);transition:opacity .55s ease,visibility .55s ease}
-#loading.done{opacity:0;visibility:hidden}
-.loader-card{width:min(560px,88vw);text-align:center}
-.logo-mark{width:88px;height:88px;margin:0 auto 18px;border-radius:28px;position:relative;background:linear-gradient(145deg,#79ddff,#2da9ff);box-shadow:0 25px 70px rgba(54,189,255,.35);animation:float 2.4s ease-in-out infinite}
-.logo-mark:before,.logo-mark:after{content:"";position:absolute;background:white;border-radius:999px}
-.logo-mark:before{width:56px;height:10px;left:16px;top:38px;transform:rotate(-12deg)}
-.logo-mark:after{width:18px;height:52px;left:35px;top:18px;clip-path:polygon(40% 0,60% 0,100% 100%,50% 78%,0 100%)}
-@keyframes float{50%{transform:translateY(-9px) rotate(2deg)}}
-.loader-title{font-size:clamp(32px,7vw,58px);font-weight:900;letter-spacing:-.04em;margin:0}.loader-sub{color:var(--muted);margin:8px 0 28px}.progress-track{height:12px;border-radius:999px;background:rgba(255,255,255,.11);overflow:hidden;border:1px solid rgba(255,255,255,.11)}
-#progressBar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit;transition:width .25s ease;box-shadow:0 0 22px rgba(82,201,255,.45)}
-#loadingTip{min-height:44px;color:#c6d5e7;margin-top:18px;font-size:14px}
+    /* Loading */
+    #loading{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:
+      radial-gradient(circle at 50% 30%,rgba(55,135,255,.2),transparent 38%),
+      linear-gradient(145deg,#07111d,#10263a 60%,#0b1825);color:#fff;transition:opacity .7s,visibility .7s}
+    #loading.done{opacity:0;visibility:hidden}
+    .loader-card{width:min(460px,86vw);text-align:center}
+    .loader-logo{width:90px;height:90px;margin:0 auto 22px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(145deg,#5eb8ff,#2867ea);box-shadow:0 22px 55px rgba(32,120,255,.35);animation:floatLogo 2.2s ease-in-out infinite}
+    .loader-logo svg{width:52px;height:52px;animation:planePulse 1.7s ease-in-out infinite}
+    @keyframes floatLogo{50%{transform:translateY(-8px)}} @keyframes planePulse{50%{transform:rotate(-5deg) scale(1.06)}}
+    .loader-card h1{font-size:32px;margin:0;letter-spacing:-1.1px}.loader-card h1 span{color:#69bdff}
+    .loader-sub{font-size:12px;text-transform:uppercase;letter-spacing:3px;color:#8da8bd;margin-top:6px}
+    .load-track{height:7px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin:34px 0 14px}
+    #loadBar{height:100%;width:0;background:linear-gradient(90deg,#4d9dff,#6ee7d2);border-radius:inherit;box-shadow:0 0 18px #4d9dff;transition:width .25s}
+    .load-meta{display:flex;justify-content:space-between;color:#8da8bd;font-size:12px}
+    #loadTip{margin:35px auto 0;max-width:360px;min-height:42px;color:#c5d4df;font-size:13px;line-height:1.6}
 
-/* Main menu */
-#menu{position:fixed;inset:0;z-index:40;display:flex;align-items:center;padding:clamp(22px,5vw,72px);pointer-events:none}
-.menu-card{pointer-events:auto;width:min(460px,100%);padding:34px;border-radius:30px;animation:menuIn .8s cubic-bezier(.2,.8,.2,1)}
-@keyframes menuIn{from{opacity:0;transform:translateY(18px) scale(.97)}}
-.brand-kicker{font-weight:800;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;font-size:12px}.brand-title{font-size:clamp(46px,8vw,78px);line-height:.9;letter-spacing:-.06em;margin:12px 0 16px}.brand-sub{color:#b9c8d8;line-height:1.55;margin:0 0 26px}
-.menu-buttons{display:grid;gap:12px}.primary-btn,.secondary-btn,.icon-btn,.tab-btn,.card-btn{border:0;cursor:pointer;transition:transform .17s ease,background .17s ease,opacity .17s ease,box-shadow .17s ease}
-.primary-btn:active,.secondary-btn:active,.icon-btn:active,.tab-btn:active,.card-btn:active{transform:scale(.97)}
-.primary-btn,.secondary-btn{height:56px;border-radius:18px;font-weight:800;text-align:left;padding:0 20px;display:flex;align-items:center;justify-content:space-between}
-.primary-btn{background:linear-gradient(135deg,#55cfff,#399cff);box-shadow:0 12px 30px rgba(45,159,255,.32)}.secondary-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
-.secondary-btn:hover{background:rgba(255,255,255,.13)}.primary-btn:disabled,.secondary-btn:disabled{opacity:.4;cursor:not-allowed}
-.menu-footer{display:flex;justify-content:space-between;margin-top:20px;color:#8295aa;font-size:12px}
+    /* Menu */
+    #menu{position:fixed;inset:0;z-index:30;display:flex;align-items:center;padding:clamp(24px,6vw,90px);padding-top:max(clamp(24px,6vw,90px),var(--safe-t));background:linear-gradient(90deg,rgba(6,17,29,.87) 0%,rgba(6,17,29,.62) 40%,rgba(6,17,29,.05) 75%);color:#fff;transition:opacity .45s,visibility .45s}
+    #menu.hidden-menu{opacity:0;visibility:hidden;pointer-events:none}
+    .menu-content{width:min(510px,100%);animation:menuIn .8s .15s both}
+    @keyframes menuIn{from{opacity:0;transform:translateY(24px)}}
+    .eyebrow{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:2.2px;color:#89c9ff}
+    .eyebrow:before{content:"";width:28px;height:2px;background:#5ca8ff}
+    .menu-title{font-size:clamp(48px,7vw,88px);line-height:.88;letter-spacing:-5px;margin:20px 0 18px;text-shadow:0 16px 45px rgba(0,0,0,.28)}
+    .menu-title small{display:block;font-size:.36em;letter-spacing:5px;color:#7dd7ff;margin-top:16px}
+    .menu-description{max-width:430px;color:#c5d2dc;font-size:15px;line-height:1.65;margin:0 0 34px}
+    .menu-actions{display:grid;gap:11px;width:min(360px,100%)}
+    .primary,.secondary,.danger,.ghost-btn{min-height:54px;padding:0 20px;border-radius:17px;display:flex;align-items:center;justify-content:center;gap:11px;font-weight:800;transition:transform .18s,filter .18s,background .18s}
+    .primary{background:linear-gradient(135deg,#5aaeff,#2f6ff0);color:#fff;box-shadow:0 12px 30px rgba(38,105,237,.33)}
+    .primary:hover,.secondary:hover,.danger:hover,.ghost-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+    .primary:active,.secondary:active,.danger:active,.ghost-btn:active{transform:scale(.98)}
+    .secondary{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.17);color:#fff;backdrop-filter:blur(12px)}
+    .secondary:disabled{opacity:.38;cursor:not-allowed;transform:none}
+    .menu-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+    .menu-footer{position:absolute;left:clamp(24px,6vw,90px);bottom:max(24px,var(--safe-b));display:flex;gap:20px;color:#8fa3b3;font-size:11px}
+    .live-badge{position:absolute;right:28px;bottom:max(26px,var(--safe-b));display:flex;gap:9px;align-items:center;padding:10px 14px;border-radius:99px;background:rgba(8,20,31,.5);border:1px solid rgba(255,255,255,.12);font-size:11px;color:#d9e6ef;backdrop-filter:blur(12px)}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#55e6a8;box-shadow:0 0 0 5px rgba(85,230,168,.12);animation:pulse 1.8s infinite}
+    @keyframes pulse{50%{box-shadow:0 0 0 9px rgba(85,230,168,0)}}
 
-/* HUD */
-#hud{position:fixed;inset:0;z-index:20;pointer-events:none;opacity:0;visibility:hidden;transition:.35s ease}
-#hud.show{opacity:1;visibility:visible}
-#topbar{position:absolute;top:max(12px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:8px;border-radius:22px;pointer-events:auto;max-width:calc(100vw - 24px)}
-.metric{min-width:118px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.065)}.metric-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em}.metric-value{font-size:19px;font-weight:900;margin-top:2px;white-space:nowrap}
-#levelMetric{min-width:150px}.level-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.xp-track{height:5px;margin-top:6px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden}.xp-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .5s ease}
-.hud-actions{position:absolute;right:14px;top:max(92px,calc(env(safe-area-inset-top) + 82px));display:grid;gap:8px;pointer-events:auto}.icon-btn{width:48px;height:48px;border-radius:16px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;font-weight:900;box-shadow:var(--shadow)}
-.icon-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#weatherBadge{position:absolute;left:14px;top:max(92px,calc(env(safe-area-inset-top) + 82px));pointer-events:auto;padding:10px 14px;border-radius:16px;color:#c9d8e8;font-size:13px;display:flex;align-items:center;gap:8px}
-.weather-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px currentColor}
+    /* HUD */
+    #gameUI{position:fixed;inset:0;z-index:15;pointer-events:none;color:var(--ink)}
+    #gameUI>*{pointer-events:auto}
+    .topbar{position:absolute;top:max(14px,var(--safe-t));left:14px;right:14px;display:flex;align-items:stretch;gap:9px}
+    .brand-chip{height:58px;min-width:58px;border-radius:18px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#53adff,#2b6ce9);box-shadow:0 10px 30px rgba(29,93,194,.25)}
+    .brand-chip svg{width:30px;height:30px}
+    .stats-bar{display:flex;gap:7px;padding:6px;border-radius:20px}
+    .stat{min-width:118px;height:46px;padding:5px 12px;display:flex;gap:9px;align-items:center;border-radius:15px;transition:background .2s}
+    .stat:hover{background:rgba(255,255,255,.55)}
+    .stat-icon{width:31px;height:31px;border-radius:11px;display:grid;place-items:center;background:#eaf3ff;color:var(--blue)}
+    .stat-icon svg{width:17px;height:17px}
+    .stat strong{display:block;font-size:14px;line-height:1.1;font-variant-numeric:tabular-nums}
+    .stat small{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:800}
+    .level-stat{min-width:150px}
+    .level-progress{height:4px;width:75px;background:#dfe8ef;border-radius:5px;margin-top:4px;overflow:hidden}
+    #levelBar{height:100%;background:linear-gradient(90deg,#4f9dff,#34d2a3);width:0;transition:width .5s}
+    .top-spacer{flex:1}
+    .world-status{min-width:154px;padding:8px 13px;border-radius:18px;display:flex;align-items:center;gap:10px}
+    .weather-icon{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:#fff2ce;color:#e99d22}
+    .world-status strong{font-size:12px;display:block}.world-status small{font-size:10px;color:var(--muted)}
+    .quick-actions{display:flex;gap:6px;padding:6px;border-radius:18px}
+    .icon-btn{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:transparent;color:#3e5367;transition:.18s}
+    .icon-btn:hover{background:rgba(255,255,255,.8);color:var(--blue);transform:translateY(-1px)}
+    .icon-btn.active{background:#eaf3ff;color:var(--blue)}
+    [data-tooltip]{position:relative}
+    @media (hover:hover){[data-tooltip]:after{content:attr(data-tooltip);position:absolute;top:calc(100% + 10px);left:50%;transform:translate(-50%,-5px);padding:7px 9px;border-radius:8px;background:#142333;color:#fff;font-size:10px;white-space:nowrap;opacity:0;visibility:hidden;transition:.18s;pointer-events:none}[data-tooltip]:hover:after{opacity:1;visibility:visible;transform:translate(-50%,0)}}
 
-#bottomnav{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:8px;border-radius:22px;pointer-events:auto}
-.tab-btn{min-width:112px;height:56px;border-radius:16px;border:0;background:transparent;color:#aab9c8;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px}
-.tab-btn.active,.tab-btn:hover{background:rgba(255,255,255,.1);color:white}.tab-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .objective{position:absolute;left:14px;top:90px;width:260px;border-radius:20px;padding:14px;transition:transform .3s,opacity .3s}
+    .objective-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+    .objective-head span{font-size:10px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue)}
+    .objective-head button{width:28px;height:28px;border-radius:9px;background:rgba(44,83,122,.07);display:grid;place-items:center;color:var(--muted)}
+    .objective h3{font-size:13px;margin:0 0 5px}.objective p{font-size:11px;line-height:1.45;color:var(--muted);margin:0}
+    .objective-bottom{display:flex;align-items:center;gap:9px;margin-top:11px}
+    .objective-track{flex:1;height:6px;background:#dfe8ef;border-radius:99px;overflow:hidden}
+    #objectiveBar{height:100%;width:0;background:var(--green);border-radius:inherit;transition:width .4s}
+    #objectiveCount{font-size:10px;font-weight:800;color:var(--muted)}
 
-/* Panels */
-#panelLayer{position:fixed;inset:0;z-index:30;pointer-events:none}
-.panel{position:absolute;left:50%;bottom:92px;transform:translate(-50%,24px);width:min(940px,calc(100vw - 24px));max-height:min(64vh,680px);border-radius:26px;opacity:0;visibility:hidden;pointer-events:auto;transition:.25s cubic-bezier(.2,.8,.2,1);overflow:hidden}
-.panel.open{opacity:1;visibility:visible;transform:translate(-50%,0)}
-.panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:20px;margin:0}.panel-head p{margin:3px 0 0;color:var(--muted);font-size:13px}.close-btn{border:0;background:rgba(255,255,255,.08);width:38px;height:38px;border-radius:13px;color:white;font-size:22px;cursor:pointer}
-.panel-body{padding:18px;overflow:auto;max-height:calc(min(64vh,680px) - 76px)}
-.card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.shop-card{position:relative;padding:16px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);min-height:176px;overflow:hidden}.shop-card.locked{opacity:.52}.card-icon{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,rgba(82,201,255,.23),rgba(126,255,168,.15));display:grid;place-items:center;font-weight:1000;font-size:20px}.shop-card h3{font-size:16px;margin:13px 0 6px}.shop-card p{font-size:12px;line-height:1.45;color:var(--muted);margin:0 0 14px}.card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}.price{font-weight:900;color:#cfeeff}.card-btn{height:38px;border-radius:12px;padding:0 14px;border:0;background:linear-gradient(135deg,#55cfff,#399cff);font-weight:900}.card-btn:disabled{opacity:.35;cursor:not-allowed}.owned-badge{font-size:11px;padding:6px 9px;border-radius:999px;background:rgba(126,255,168,.14);color:var(--accent2);font-weight:800}.level-badge{position:absolute;right:14px;top:14px;font-size:11px;color:var(--muted)}
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.setting{padding:16px;border-radius:18px;background:rgba(255,255,255,.06)}.setting label{display:flex;justify-content:space-between;font-weight:800;font-size:14px;margin-bottom:12px}.setting small{color:var(--muted)}input[type=range]{width:100%;accent-color:#4cc9ff}select{width:100%;height:44px;border-radius:12px;background:#13263b;color:white;border:1px solid var(--line);padding:0 12px}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat-card{padding:16px;border-radius:18px;background:rgba(255,255,255,.06)}.stat-card .big{font-weight:1000;font-size:24px}.stat-card .small{font-size:12px;color:var(--muted);margin-top:4px}.chart{margin-top:14px;padding:18px;border-radius:18px;background:rgba(255,255,255,.05)}.bars{height:150px;display:flex;align-items:end;gap:8px}.bar{flex:1;min-width:10px;background:linear-gradient(#57d6ff,#4578ff);border-radius:7px 7px 3px 3px;min-height:4px;transition:height .4s ease}.chart-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:10px}
+    .flight-board{position:absolute;right:14px;top:90px;width:270px;border-radius:20px;padding:13px}
+    .flight-board-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .flight-board-title strong{font-size:11px;text-transform:uppercase;letter-spacing:1px}
+    .flight-board-title span{font-size:9px;padding:4px 7px;border-radius:99px;background:#e9faf3;color:#11865c;font-weight:900}
+    #flightList{display:grid;gap:6px}
+    .flight-row{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:9px;padding:8px;border-radius:13px;background:rgba(244,248,251,.8);transition:.2s}
+    .flight-row:hover{background:#fff;transform:translateX(-2px)}
+    .airline-logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:900}
+    .flight-info strong{font-size:10px;display:block}.flight-info small{font-size:9px;color:var(--muted)}
+    .flight-phase{font-size:8px;font-weight:900;text-transform:uppercase;color:var(--blue);max-width:65px;text-align:right}
+    .empty-flights{padding:14px;text-align:center;color:var(--muted);font-size:10px}
 
-/* Modals */
-#modalLayer{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(2,7,13,.62);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:.2s ease}
-#modalLayer.open{opacity:1;visibility:visible}.modal{width:min(520px,94vw);max-height:86vh;overflow:auto;border-radius:28px;padding:24px}.modal h2{margin:0 0 8px}.modal p{color:var(--muted);line-height:1.55}.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}.modal-actions button{height:46px;border:0;border-radius:14px;padding:0 18px;font-weight:900;cursor:pointer}.danger-btn{background:var(--danger)}
+    .speed-control{position:absolute;right:14px;bottom:96px;border-radius:16px;padding:5px;display:flex;gap:4px}
+    .speed-control button{width:40px;height:36px;border-radius:11px;background:transparent;color:var(--muted);font-size:11px;font-weight:900}
+    .speed-control button.active{background:#eaf3ff;color:var(--blue)}
 
-/* Toast / effects */
-#toastStack{position:fixed;right:16px;top:150px;z-index:200;display:grid;gap:10px;pointer-events:none}.toast{width:min(360px,calc(100vw - 32px));padding:14px 16px;border-radius:16px;background:rgba(10,24,41,.92);border:1px solid var(--line);box-shadow:var(--shadow);animation:toastIn .32s cubic-bezier(.2,.8,.2,1)}@keyframes toastIn{from{opacity:0;transform:translateX(20px)}}.toast-title{font-weight:900}.toast-text{font-size:12px;color:var(--muted);margin-top:3px}
-.money-pop{position:fixed;z-index:150;font-size:24px;font-weight:1000;color:var(--accent2);text-shadow:0 3px 10px #000;pointer-events:none;animation:moneyFly 1.2s ease forwards}@keyframes moneyFly{to{transform:translateY(-80px) scale(1.12);opacity:0}}
-#tooltip{position:fixed;z-index:300;padding:8px 10px;background:#07111f;border:1px solid var(--line);border-radius:10px;font-size:12px;opacity:0;visibility:hidden;pointer-events:none;transition:.15s ease;max-width:220px;box-shadow:var(--shadow)}
-#placeHint{position:fixed;left:50%;bottom:180px;transform:translateX(-50%);z-index:60;padding:12px 18px;border-radius:16px;font-weight:800;opacity:0;visibility:hidden;transition:.2s ease;pointer-events:none;text-align:center}#placeHint.show{opacity:1;visibility:visible}
+    .bottom-nav{position:absolute;z-index:45;left:50%;bottom:max(15px,var(--safe-b));transform:translateX(-50%);display:flex;gap:5px;padding:7px;border-radius:23px}
+    .nav-btn{width:92px;height:58px;border-radius:17px;background:transparent;display:grid;place-items:center;align-content:center;gap:4px;color:#536678;font-size:9px;font-weight:800;transition:.2s}
+    .nav-btn svg{width:22px;height:22px}.nav-btn:hover,.nav-btn.active{background:#eaf3ff;color:var(--blue);transform:translateY(-2px)}
+    .nav-btn .badge{position:absolute;margin:-26px 0 0 24px;min-width:16px;height:16px;border-radius:8px;padding:0 4px;background:#ef5b5b;color:#fff;display:grid;place-items:center;font-size:8px;border:2px solid #fff}
 
-/* Mobile */
-@media(max-width:760px){
-  .menu-card{padding:24px;border-radius:25px}.brand-title{font-size:52px}.menu-footer{display:none}
-  #topbar{top:max(8px,env(safe-area-inset-top));width:calc(100vw - 12px);gap:4px;padding:5px;overflow-x:auto;justify-content:flex-start}.metric{min-width:102px;padding:8px 10px}.metric-label{font-size:9px}.metric-value{font-size:16px}#levelMetric{min-width:126px}
-  .hud-actions{right:8px;top:max(79px,calc(env(safe-area-inset-top) + 70px));gap:6px}.icon-btn{width:44px;height:44px;border-radius:14px}
-  #weatherBadge{left:8px;top:max(79px,calc(env(safe-area-inset-top) + 70px));font-size:11px;padding:9px 11px}
-  #bottomnav{width:calc(100vw - 12px);bottom:max(6px,env(safe-area-inset-bottom));gap:3px;padding:5px;justify-content:space-around}.tab-btn{min-width:0;flex:1;height:54px;border-radius:14px;font-size:10px;flex-direction:column;gap:2px}.tab-btn svg{width:19px;height:19px}
-  .panel{bottom:70px;width:100%;max-height:66vh;border-radius:26px 26px 0 0}.panel-body{padding:13px}.card-grid{grid-template-columns:1fr 1fr;gap:9px}.shop-card{padding:13px;min-height:184px}.shop-card h3{font-size:14px}.settings-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}.stat-card .big{font-size:20px}
-  #toastStack{right:8px;top:132px}.toast{width:calc(100vw - 16px)}
-  #placeHint{bottom:145px;width:calc(100vw - 28px)}
-}
-@media(max-width:390px){.card-grid{grid-template-columns:1fr}.shop-card{min-height:150px}.metric{min-width:92px}.metric-value{font-size:14px}}
-@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-</style>
+    /* Panels & modal */
+    #scrim{position:fixed;inset:0;z-index:12;background:rgba(4,13,22,.28);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:.25s}
+    #scrim.show{opacity:1;visibility:visible}
+    #panel{position:fixed;z-index:40;left:14px;top:82px;bottom:15px;width:min(420px,calc(100vw - 28px));border-radius:26px;transform:translateX(calc(-100% - 30px));transition:transform .38s cubic-bezier(.22,.9,.27,1);overflow:hidden;display:flex;flex-direction:column}
+    #panel.show{transform:none}
+    .panel-head{padding:18px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+    .panel-head-icon{width:40px;height:40px;border-radius:13px;background:#eaf3ff;color:var(--blue);display:grid;place-items:center}
+    .panel-title{flex:1}.panel-title h2{font-size:17px;margin:0}.panel-title p{font-size:10px;color:var(--muted);margin:3px 0 0}
+    .close-btn{width:38px;height:38px;border-radius:12px;background:#eef3f6;display:grid;place-items:center;color:#5f7180}
+    .panel-body{padding:14px 14px 24px;overflow:auto;overscroll-behavior:contain}
+    .panel-tabs{display:flex;padding:4px;background:#eaf0f4;border-radius:13px;margin-bottom:13px}
+    .panel-tabs button{flex:1;height:34px;border-radius:10px;background:transparent;color:var(--muted);font-size:10px;font-weight:800}
+    .panel-tabs button.active{background:#fff;color:var(--blue);box-shadow:0 4px 13px rgba(18,47,73,.08)}
+    .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .shop-card{position:relative;padding:13px;border-radius:18px;background:rgba(247,250,252,.85);border:1px solid var(--line);min-height:166px;display:flex;flex-direction:column;transition:.2s;overflow:hidden}
+    .shop-card:hover{border-color:rgba(52,120,246,.32);transform:translateY(-2px);box-shadow:0 10px 24px rgba(18,55,90,.08)}
+    .shop-card.locked{filter:saturate(.3);opacity:.68}
+    .shop-card.built{background:#effaf6}
+    .shop-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--blue);background:#e7f1ff;margin-bottom:10px}
+    .shop-card h3{font-size:12px;margin:0 0 5px}.shop-card p{font-size:9px;line-height:1.45;color:var(--muted);margin:0 0 12px}
+    .shop-action{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .price{font-size:10px;font-weight:900;color:#1c7a58}.price.lock{color:var(--muted)}
+    .mini-buy{height:31px;padding:0 11px;border-radius:10px;background:var(--blue);color:#fff;font-size:9px;font-weight:900}
+    .mini-buy:disabled{background:#c7d2da;color:#758491}
+    .built-mark{position:absolute;right:9px;top:9px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#32c990;color:#fff}
+    .level-dots{display:flex;gap:4px;margin:5px 0 10px}.level-dots i{display:block;width:18px;height:4px;border-radius:3px;background:#d8e2e9}.level-dots i.on{background:#4a94fa}
+    .upgrade-effect{font-size:9px;color:#16845e;font-weight:700}
+    .section-label{font-size:9px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:16px 2px 9px}
+
+    .stat-hero{padding:18px;border-radius:20px;background:linear-gradient(135deg,#eaf4ff,#f5fbff);margin-bottom:10px}
+    .stat-hero-head{display:flex;justify-content:space-between;align-items:flex-start}.stat-hero h3{margin:0;font-size:12px}.stat-hero strong{font-size:30px;letter-spacing:-1px}
+    .trend{font-size:9px;color:#138a61;font-weight:900;padding:5px 8px;background:#fff;border-radius:8px}
+    #sparkline{width:100%;height:70px;margin-top:10px;overflow:visible}
+    .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .metric{padding:13px;border-radius:16px;background:#f4f8fa}.metric small{font-size:9px;color:var(--muted);display:block}.metric strong{font-size:17px;margin-top:5px;display:block}
+    .achievement{display:flex;gap:11px;align-items:center;padding:11px;border-radius:15px;background:#f5f8fa;margin-bottom:7px}
+    .achievement.locked{opacity:.48}.achievement-icon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:#fff1cb;color:#d88c16}
+    .achievement strong{font-size:10px;display:block}.achievement small{font-size:9px;color:var(--muted)}
+
+    #modalWrap{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:18px;background:rgba(4,13,22,.5);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:.25s}
+    #modalWrap.show{opacity:1;visibility:visible}
+    .modal{width:min(500px,100%);max-height:min(760px,94vh);overflow:auto;border-radius:27px;padding:22px;transform:translateY(16px) scale(.97);transition:.28s}
+    #modalWrap.show .modal{transform:none}
+    .modal-top{display:flex;align-items:center;margin-bottom:19px}.modal-top h2{font-size:20px;margin:0;flex:1}.modal-close{width:38px;height:38px;border-radius:12px;background:#edf2f5;display:grid;place-items:center}
+    .settings-list{display:grid;gap:10px}
+    .setting-row{min-height:62px;border-radius:16px;padding:11px 13px;background:#f4f7f9;display:flex;align-items:center;gap:12px}
+    .setting-row>.icon-wrap{width:37px;height:37px;border-radius:12px;background:#fff;color:var(--blue);display:grid;place-items:center}
+    .setting-text{flex:1}.setting-text strong{font-size:11px;display:block}.setting-text small{font-size:9px;color:var(--muted)}
+    input[type=range]{accent-color:var(--blue);width:118px}
+    select{height:36px;border:0;border-radius:10px;background:#fff;padding:0 10px;color:var(--ink);font-size:10px;font-weight:800}
+    .danger{background:#fff0f0;color:#d83f4b;min-height:44px;border:1px solid #ffd7da;margin-top:13px;width:100%}
+    .about-logo{width:76px;height:76px;border-radius:23px;margin:5px auto 17px;background:linear-gradient(145deg,#5bb4ff,#2d6eea);display:grid;place-items:center;color:#fff;box-shadow:0 18px 35px rgba(43,111,234,.25)}
+    .about-logo svg{width:43px;height:43px}.about-copy{text-align:center}.about-copy h3{font-size:22px;margin:0}.about-copy .version{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+    .about-copy p{text-align:left;font-size:11px;line-height:1.7;color:var(--muted);background:#f4f7f9;padding:14px;border-radius:16px;margin-top:18px}
+
+    /* Tutorial / placement */
+    #tutorial{position:fixed;z-index:80;inset:0;display:grid;place-items:center;padding:18px;background:rgba(4,13,22,.48);backdrop-filter:blur(5px)}
+    .tutorial-card{width:min(430px,100%);border-radius:28px;padding:23px;overflow:hidden;position:relative}
+    .tutorial-art{height:150px;margin:-23px -23px 19px;background:linear-gradient(135deg,#d9efff,#eafaff);display:grid;place-items:center;position:relative;overflow:hidden}
+    .tutorial-art:before{content:"";width:260px;height:64px;background:#a8d882;position:absolute;bottom:-28px;border-radius:50%}
+    .tutorial-art .big-plane{width:100px;height:100px;color:#397de8;filter:drop-shadow(0 15px 10px rgba(30,85,150,.2));animation:flyTeach 3s ease-in-out infinite}
+    @keyframes flyTeach{50%{transform:translate(20px,-9px) rotate(-4deg)}}
+    .step-count{font-size:9px;color:var(--blue);font-weight:900;text-transform:uppercase;letter-spacing:1.5px}
+    .tutorial-card h2{font-size:22px;margin:7px 0 8px}.tutorial-card p{font-size:12px;line-height:1.65;color:var(--muted);min-height:58px}
+    .tutorial-actions{display:flex;gap:9px;margin-top:18px}.tutorial-actions button{flex:1}
+    .ghost-btn{background:#edf3f7;color:#536574}
+    .tutorial-dots{display:flex;gap:5px;justify-content:center;margin-top:17px}.tutorial-dots i{width:6px;height:6px;border-radius:9px;background:#ccd8e0}.tutorial-dots i.on{width:19px;background:var(--blue)}
+    #placementHint{position:fixed;z-index:35;left:50%;top:max(90px,calc(var(--safe-t) + 70px));transform:translate(-50%,-15px);opacity:0;visibility:hidden;transition:.25s;display:flex;align-items:center;gap:10px;padding:9px 10px 9px 15px;border-radius:17px;color:#fff;background:rgba(12,28,42,.85);box-shadow:0 14px 35px rgba(0,0,0,.23);backdrop-filter:blur(15px)}
+    #placementHint.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+    #placementHint strong{font-size:11px}#placementHint small{font-size:9px;color:#b9c9d5;display:block}
+    #placementHint button{height:36px;padding:0 12px;border-radius:11px;background:#ef6464;color:#fff;font-size:9px;font-weight:900}
+    #toastZone{position:fixed;z-index:95;left:50%;top:max(90px,calc(var(--safe-t) + 75px));transform:translateX(-50%);display:grid;gap:8px;width:min(360px,calc(100vw - 28px));pointer-events:none}
+    .toast{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(16,32,47,.92);color:#fff;box-shadow:0 16px 35px rgba(0,0,0,.22);backdrop-filter:blur(16px);animation:toastIn .35s both}
+    .toast.good .toast-dot{background:#3dd59a}.toast.warn .toast-dot{background:#ffb347}
+    .toast-dot{width:9px;height:9px;border-radius:50%;background:#65aaff;box-shadow:0 0 0 5px rgba(101,170,255,.13)}
+    .toast div{font-size:10px;line-height:1.4}.toast strong{display:block;font-size:11px}
+    @keyframes toastIn{from{opacity:0;transform:translateY(-12px) scale(.96)}} @keyframes toastOut{to{opacity:0;transform:translateY(-10px)}}
+    .money-float{position:fixed;z-index:60;color:#19a974;font-size:16px;font-weight:900;text-shadow:0 2px 10px #fff;pointer-events:none;animation:moneyUp 1.4s both}
+    @keyframes moneyUp{to{transform:translateY(-65px) scale(1.15);opacity:0}}
+
+    /* Mobile */
+    @media(max-width:800px){
+      .topbar{top:max(8px,var(--safe-t));left:8px;right:8px;gap:5px}.brand-chip{display:none}
+      .stats-bar{width:100%;gap:2px;padding:4px;border-radius:16px}.stat{flex:1;min-width:0;height:43px;padding:4px 5px;justify-content:center;gap:5px}.stat-icon{width:27px;height:27px;border-radius:9px}.stat-icon svg{width:15px;height:15px}.stat strong{font-size:11px}.stat small{font-size:7px;letter-spacing:.3px}.level-stat{min-width:0}.level-progress{width:43px}
+      .world-status{position:absolute;top:54px;right:0;min-width:134px;padding:6px 9px;border-radius:14px}.weather-icon{width:30px;height:30px}.quick-actions{position:absolute;top:54px;left:0;padding:4px;border-radius:14px}.icon-btn{width:39px;height:39px;border-radius:11px}.quick-actions .desktop-only{display:none}
+      .objective{top:112px;left:8px;width:210px;padding:11px;border-radius:16px}.objective p{display:none}.objective-bottom{margin-top:7px}.objective h3{font-size:10px}
+      .flight-board{display:none}.speed-control{right:8px;bottom:91px}
+      .bottom-nav{bottom:max(7px,var(--safe-b));width:calc(100% - 16px);justify-content:space-around;padding:5px;border-radius:19px}.nav-btn{flex:1;width:auto;height:54px;border-radius:14px;font-size:8px}.nav-btn svg{width:21px;height:21px}
+      #panel{left:0;right:0;top:auto;bottom:0;width:100%;height:min(72vh,670px);border-radius:27px 27px 0 0;transform:translateY(105%);padding-bottom:var(--safe-b)}#panel.show{transform:none}.panel-body{padding-bottom:calc(88px + var(--safe-b))}
+      .card-grid{gap:8px}.shop-card{min-height:158px}
+      .menu-title{letter-spacing:-3px}.menu-content{margin-top:-7vh}.menu-footer,.live-badge{display:none}#menu{align-items:center;background:linear-gradient(180deg,rgba(5,16,28,.46),rgba(5,16,28,.85) 72%);padding:25px}.menu-actions{width:100%}
+      .modal{padding:17px;border-radius:23px}input[type=range]{width:90px}.setting-row{padding:9px}
+      #toastZone{top:max(122px,calc(var(--safe-t) + 105px))}
+    }
+    @media(max-width:420px){.stat-icon{display:none}.objective{width:190px}.card-grid{grid-template-columns:1fr 1fr}.menu-title{font-size:52px}.settings-list{gap:7px}}
+    @media(max-height:650px) and (orientation:landscape){.objective,.world-status{display:none}.bottom-nav{left:12px;bottom:10px;transform:none;width:auto;flex-direction:column}.nav-btn{width:58px;height:48px}.nav-btn span:not(.badge){display:none}.speed-control{bottom:10px}.topbar{right:8px}.stats-bar{width:auto}.stat{min-width:88px}#panel{top:8px;bottom:8px;height:auto;width:370px;left:80px;border-radius:22px;transform:translateX(-120%)}#panel.show{transform:none}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+  </style>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+  </script>
 </head>
 <body>
-<div id="app">
-  <div id="world"></div>
+  <svg width="0" height="0" style="position:absolute">
+    <symbol id="i-plane" viewBox="0 0 24 24"><path d="M22 2 9.8 14.2M15 3.8l5.2-.9.9 5.2M11.5 8.5 5 5.7 3.4 7.3l4.5 4.6M15.4 12.7l2.8 6.5-1.6 1.6-4.7-4.7M9.8 14.2 5 19l-2 .7.7-2 4.8-4.8"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7M3 11v4c0 1.7 2.7 3 6 3 1.1 0 2.1-.1 3-.4"/><path d="M15 11.4c.6-.2 1.3-.4 2-.4 2.2 0 4 1.3 4 3s-1.8 3-4 3-4-1.3-4-3 1.8-3 4-3v6c2.2 0 4 1.3 4 3s-1.8 3-4 3-4-1.3-4-3"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2c0-3 3-5 7-5s7 2 7 5v2M16 4.5a3.5 3.5 0 0 1 0 6.8M18 14c2.4.7 4 2.4 4 4.5V21"/></symbol>
+    <symbol id="i-flight" viewBox="0 0 24 24"><path d="M4 19h16M7 15l10-10M9 5h8v8M5 8v7h7"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3 6 7 .9-5 4.7 1.4 6.7L12 17l-6.4 3.3L7 13.6 2 8.9 9 8z"/></symbol>
+    <symbol id="i-build" viewBox="0 0 24 24"><path d="m14 6 4-4 4 4-4 4M18 2v8M2 22l7-7M7 8l9 9-5 5-9-9z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 21V4M5 11l7-7 7 7"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7M2 20h22"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h12l3 3v15H4V3zM8 3v6h8V3M8 21v-7h8v7"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM17 8a6 6 0 0 1 0 8M19.5 5.5a10 10 0 0 1 0 13"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M5 18h13a4 4 0 0 0 .4-8A7 7 0 0 0 5.2 9.4 4.3 4.3 0 0 0 5 18z"/></symbol>
+    <symbol id="i-rain" viewBox="0 0 24 24"><path d="M5 14h13a4 4 0 0 0 .4-8A7 7 0 0 0 5.2 5.4 4.3 4.3 0 0 0 5 14zM8 17l-1 3M13 17l-1 3M18 17l-1 3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4v2a4 4 0 0 0 4 4M16 6h4v2a4 4 0 0 1-4 4M12 13v5M8 21h8M9 18h6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 7h4l2-2h4l2 2h4v12H4z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8h14v13M8 11h3v3H8zM13 11h3v3h-3zM8 16h3v5M13 16h3v5M7 8l5-5 5 5"/></symbol>
+    <symbol id="i-road" viewBox="0 0 24 24"><path d="M8 2 5 22M16 2l3 20M12 3v4M12 10v4M12 17v4"/></symbol>
+  </svg>
 
-  <div id="loading">
-    <div class="loader-card">
-      <div class="logo-mark"></div>
-      <h1 class="loader-title">SKYPORT</h1>
-      <div class="loader-sub">Airport Tycoon</div>
-      <div class="progress-track"><div id="progressBar"></div></div>
-      <div id="loadingTip">Preparing the runway…</div>
-    </div>
-  </div>
+  <div id="app">
+    <div id="scene" aria-label="Трёхмерный аэропорт"></div>
 
-  <section id="menu">
-    <div class="menu-card glass">
-      <div class="brand-kicker">Build. Connect. Grow.</div>
-      <h1 class="brand-title">Skyport</h1>
-      <p class="brand-sub">Turn a tiny regional airfield into a living international airport. Every flight matters, every upgrade changes the world.</p>
-      <div class="menu-buttons">
-        <button id="newGameBtn" class="primary-btn"><span>New Game</span><span>→</span></button>
-        <button id="continueBtn" class="secondary-btn"><span>Continue</span><span>↗</span></button>
-        <button id="menuSettingsBtn" class="secondary-btn"><span>Settings</span><span>⚙</span></button>
-        <button id="aboutBtn" class="secondary-btn"><span>About</span><span>i</span></button>
+    <div id="loading">
+      <div class="loader-card">
+        <div class="loader-logo"><svg class="icon"><use href="#i-plane"/></svg></div>
+        <h1>AIRPORT <span>TYCOON</span></h1>
+        <div class="loader-sub">International Operations</div>
+        <div class="load-track"><div id="loadBar"></div></div>
+        <div class="load-meta"><span id="loadStage">Подготовка аэродрома</span><strong id="loadPercent">0%</strong></div>
+        <div id="loadTip">Совет: быстрее обслуживайте самолёты, чтобы освободить гейты для новых рейсов.</div>
       </div>
-      <div class="menu-footer"><span>Single-file edition</span><span>v1.0</span></div>
     </div>
-  </section>
 
-  <section id="hud">
-    <div id="topbar" class="glass">
-      <div class="metric"><div class="metric-label" data-i18n="money">Money</div><div id="moneyValue" class="metric-value">$0</div></div>
-      <div class="metric"><div class="metric-label" data-i18n="passengers">Passengers</div><div id="passengerValue" class="metric-value">0</div></div>
-      <div class="metric"><div class="metric-label" data-i18n="flights">Flights</div><div id="flightValue" class="metric-value">0</div></div>
-      <div id="levelMetric" class="metric"><div class="level-row"><div><div class="metric-label" data-i18n="airportLevel">Airport Level</div><div id="levelValue" class="metric-value">1</div></div><div id="levelName">Local</div></div><div class="xp-track"><div id="xpBar" class="xp-bar"></div></div></div>
-    </div>
-    <div id="weatherBadge" class="glass"><span class="weather-dot"></span><span id="weatherText">Sunny • 12:00</span></div>
-    <div class="hud-actions">
-      <button id="saveBtn" class="icon-btn" data-tip="Manual save" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg></button>
-      <button id="fullscreenBtn" class="icon-btn" data-tip="Fullscreen" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg></button>
-      <button id="pauseBtn" class="icon-btn" data-tip="Pause" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
-    </div>
-    <nav id="bottomnav" class="glass">
-      <button class="tab-btn" data-panel="buildPanel" data-tip="Build airport facilities"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12M9 20v-6h6v6"/></svg><span data-i18n="build">Build</span></button>
-      <button class="tab-btn" data-panel="upgradePanel" data-tip="Improve airport efficiency"><svg viewBox="0 0 24 24"><path d="M12 20V6M6 12l6-6 6 6"/></svg><span data-i18n="upgrade">Upgrade</span></button>
-      <button class="tab-btn" data-panel="statsPanel" data-tip="Airport performance"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="statistics">Statistics</span></button>
-      <button class="tab-btn" data-panel="settingsPanel" data-tip="Game settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5v-3l-2-.8-.7-1.7.8-2-2.1-2.1-2 .8-1.7-.7-.8-2h-3l-.8 2-1.7.7-2-.8L1 6l.8 2-.7 1.7-2 .8v3l2 .8.7 1.7-.8 2L3 20.1l2-.8 1.7.7.8 2h3l.8-2 1.7-.7 2 .8L17.1 18l-.8-2 .7-1.7z" transform="translate(2 0) scale(.83)"/></svg><span data-i18n="settings">Settings</span></button>
-    </nav>
-  </section>
+    <main id="menu" aria-label="Главное меню">
+      <div class="menu-content">
+        <div class="eyebrow">Создай аэропорт мечты</div>
+        <h1 class="menu-title">AIRPORT<small>TYCOON 2026</small></h1>
+        <p class="menu-description">Преврати маленький региональный аэродром в живой международный хаб. Принимай рейсы, развивай терминалы и наблюдай, как твой аэропорт растёт.</p>
+        <div class="menu-actions">
+          <button id="newGame" class="primary"><svg class="icon"><use href="#i-play"/></svg><span>Новая игра</span></button>
+          <button id="continueGame" class="secondary"><svg class="icon"><use href="#i-flight"/></svg><span>Продолжить</span></button>
+          <div class="menu-row">
+            <button id="menuSettings" class="secondary"><svg class="icon"><use href="#i-settings"/></svg><span>Настройки</span></button>
+            <button id="menuAbout" class="secondary"><svg class="icon"><use href="#i-info"/></svg><span>Об игре</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-footer"><span>Один файл · Автосохранение</span><span>Мышь / сенсор</span></div>
+      <div class="live-badge"><i class="live-dot"></i><span id="menuWeather">Ясно · 08:00</span></div>
+    </main>
 
-  <div id="panelLayer">
-    <section id="buildPanel" class="panel glass"><div class="panel-head"><div><h2 data-i18n="buildAirport">Build Airport</h2><p data-i18n="buildHint">Choose a facility, then tap its glowing construction zone.</p></div><button class="close-btn">×</button></div><div id="buildGrid" class="panel-body card-grid"></div></section>
-    <section id="upgradePanel" class="panel glass"><div class="panel-head"><div><h2 data-i18n="upgrades">Upgrades</h2><p data-i18n="upgradeHint">Permanent improvements with visible results.</p></div><button class="close-btn">×</button></div><div id="upgradeGrid" class="panel-body card-grid"></div></section>
-    <section id="statsPanel" class="panel glass"><div class="panel-head"><div><h2 data-i18n="airportStats">Airport Statistics</h2><p data-i18n="statsHint">A clear view of growth and efficiency.</p></div><button class="close-btn">×</button></div><div class="panel-body"><div id="statGrid" class="stat-grid"></div><div class="chart"><div id="bars" class="bars"></div><div class="chart-labels"><span>Earlier</span><span>Recent income</span><span>Now</span></div></div></div></section>
-    <section id="settingsPanel" class="panel glass"><div class="panel-head"><div><h2 data-i18n="settings">Settings</h2><p data-i18n="settingsHint">Tune sound, graphics and language.</p></div><button class="close-btn">×</button></div><div class="panel-body"><div class="settings-grid">
-      <div class="setting"><label><span data-i18n="musicVolume">Music volume</span><small id="musicVal">35%</small></label><input id="musicRange" type="range" min="0" max="100" value="35"></div>
-      <div class="setting"><label><span data-i18n="effectsVolume">Effects volume</span><small id="effectsVal">65%</small></label><input id="effectsRange" type="range" min="0" max="100" value="65"></div>
-      <div class="setting"><label><span data-i18n="graphics">Graphics</span></label><select id="graphicsSelect"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
-      <div class="setting"><label><span data-i18n="language">Language</span></label><select id="languageSelect"><option value="en">English</option><option value="ru">Русский</option></select></div>
-      <div class="setting"><button id="manualSaveSettings" class="secondary-btn" style="width:100%"><span data-i18n="manualSave">Manual Save</span><span>✓</span></button></div>
-      <div class="setting"><button id="resetBtn" class="secondary-btn" style="width:100%;background:rgba(255,118,140,.14);color:#ff9aaa"><span data-i18n="resetSave">Reset Save</span><span>!</span></button></div>
-    </div></div></section>
+    <section id="gameUI" class="hidden" aria-label="Игровой интерфейс">
+      <header class="topbar">
+        <div class="brand-chip"><svg class="icon"><use href="#i-plane"/></svg></div>
+        <div class="stats-bar glass">
+          <div class="stat" data-tooltip="Доступные средства">
+            <span class="stat-icon"><svg class="icon"><use href="#i-coins"/></svg></span>
+            <span><strong id="moneyValue">₽85 000</strong><small>Бюджет</small></span>
+          </div>
+          <div class="stat" data-tooltip="Пассажиры сегодня">
+            <span class="stat-icon"><svg class="icon"><use href="#i-users"/></svg></span>
+            <span><strong id="passengerValue">0</strong><small>Пассажиры</small></span>
+          </div>
+          <div class="stat" data-tooltip="Выполненные рейсы">
+            <span class="stat-icon"><svg class="icon"><use href="#i-flight"/></svg></span>
+            <span><strong id="flightValue">0</strong><small>Рейсы</small></span>
+          </div>
+          <div class="stat level-stat" data-tooltip="Уровень аэропорта">
+            <span class="stat-icon"><svg class="icon"><use href="#i-star"/></svg></span>
+            <span><strong id="levelValue">Уровень 1</strong><div class="level-progress"><div id="levelBar"></div></div></span>
+          </div>
+        </div>
+        <div class="top-spacer"></div>
+        <div class="world-status glass">
+          <span id="weatherBadge" class="weather-icon"><svg class="icon"><use href="#i-sun"/></svg></span>
+          <span><strong id="weatherText">Ясно</strong><small id="timeText">День 1 · 08:00</small></span>
+        </div>
+        <div class="quick-actions glass">
+          <button id="cameraHome" class="icon-btn desktop-only" aria-label="Общий вид" data-tooltip="Общий вид"><svg class="icon"><use href="#i-camera"/></svg></button>
+          <button id="manualSave" class="icon-btn" aria-label="Сохранить игру" data-tooltip="Сохранить"><svg class="icon"><use href="#i-save"/></svg></button>
+          <button id="fullScreen" class="icon-btn" aria-label="На весь экран" data-tooltip="На весь экран"><svg class="icon"><use href="#i-full"/></svg></button>
+        </div>
+      </header>
+
+      <aside id="objectiveCard" class="objective glass">
+        <div class="objective-head"><span>Текущая цель</span><button id="hideObjective" aria-label="Скрыть цель" data-tooltip="Скрыть цель"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        <h3 id="objectiveTitle">Встречаем первые рейсы</h3>
+        <p id="objectiveDesc">Обслужите два самолёта, чтобы получить стартовый бонус.</p>
+        <div class="objective-bottom"><div class="objective-track"><div id="objectiveBar"></div></div><span id="objectiveCount">0 / 2</span></div>
+      </aside>
+
+      <aside class="flight-board glass">
+        <div class="flight-board-title"><strong>Табло рейсов</strong><span id="flightLive">0 в работе</span></div>
+        <div id="flightList"><div class="empty-flights">Первый рейс уже приближается…</div></div>
+      </aside>
+
+      <div class="speed-control glass" aria-label="Скорость игры">
+        <button data-speed="0">Ⅱ</button><button data-speed="1" class="active">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button>
+      </div>
+
+      <nav class="bottom-nav glass">
+        <button class="nav-btn" data-panel="build"><svg class="icon"><use href="#i-build"/></svg><span>Строить</span><i id="buildBadge" class="badge">3</i></button>
+        <button class="nav-btn" data-panel="upgrade"><svg class="icon"><use href="#i-up"/></svg><span>Улучшения</span></button>
+        <button class="nav-btn" data-panel="stats"><svg class="icon"><use href="#i-chart"/></svg><span>Статистика</span></button>
+        <button class="nav-btn" data-panel="settings"><svg class="icon"><use href="#i-settings"/></svg><span>Настройки</span></button>
+      </nav>
+    </section>
+
+    <div id="scrim"></div>
+    <aside id="panel" class="glass" aria-label="Игровая панель">
+      <div class="panel-head">
+        <span id="panelIcon" class="panel-head-icon"><svg class="icon"><use href="#i-build"/></svg></span>
+        <div class="panel-title"><h2 id="panelTitle">Строительство</h2><p id="panelSub">Расширяйте аэропорт</p></div>
+        <button id="closePanel" class="close-btn" aria-label="Закрыть панель" data-tooltip="Закрыть"><svg class="icon"><use href="#i-x"/></svg></button>
+      </div>
+      <div id="panelBody" class="panel-body"></div>
+    </aside>
+
+    <div id="modalWrap"><div id="modal" class="modal glass"></div></div>
+
+    <div id="tutorial" class="hidden">
+      <div class="tutorial-card glass">
+        <div class="tutorial-art"><svg class="icon big-plane"><use href="#i-plane"/></svg></div>
+        <div id="tutorialStep" class="step-count">Шаг 1 из 4</div>
+        <h2 id="tutorialTitle">Добро пожаловать, директор!</h2>
+        <p id="tutorialText">Ваш первый аэропорт уже работает. Самолёты сами заходят на посадку, а вы развиваете инфраструктуру и ускоряете обслуживание.</p>
+        <div class="tutorial-actions"><button id="skipTutorial" class="ghost-btn">Пропустить</button><button id="nextTutorial" class="primary">Далее</button></div>
+        <div id="tutorialDots" class="tutorial-dots"></div>
+      </div>
+    </div>
+
+    <div id="placementHint"><span><strong id="placementTitle">Выберите место</strong><small>Коснитесь подсвеченной зоны для установки</small></span><button id="cancelPlacement">Отмена</button></div>
+    <div id="toastZone"></div>
   </div>
 
-  <div id="modalLayer"><div id="modal" class="modal glass"></div></div>
-  <div id="toastStack"></div>
-  <div id="tooltip"></div>
-  <div id="placeHint" class="glass">Tap the glowing zone to place this facility</div>
-</div>
+  <script>
+    window.addEventListener("error",function(e){
+      if(!document.getElementById("loading").classList.contains("done")){
+        document.getElementById("loadStage").textContent="Не удалось загрузить 3D-движок";
+        document.getElementById("loadTip").textContent="Проверьте подключение к интернету и перезагрузите страницу.";
+      }
+    });
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+    import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/+esm';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/OrbitControls.js/+esm';
-import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/EffectComposer.js/+esm';
-import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/RenderPass.js/+esm';
-import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/UnrealBloomPass.js/+esm';
+    const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+    const SAVE_KEY="airportTycoon2026Save_v4", PREF_KEY="airportTycoon2026Prefs_v2";
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+    const lerp=(a,b,t)=>a+(b-a)*t;
+    const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    const fmt=n=>new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}).format(Math.round(n));
+    const money=n=>"₽"+fmt(n);
+    const tr=(ru,en)=>game&&game.state.lang==="en"?en:ru;
+    const icon=id=>'<svg class="icon"><use href="#i-'+id+'"/></svg>';
 
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const lerp=(a,b,t)=>a+(b-a)*t;
-const smooth=t=>t*t*(3-2*t);
-const fmt=n=>new Intl.NumberFormat(state.settings.language==='ru'?'ru-RU':'en-US',{maximumFractionDigits:0}).format(Math.floor(n));
-const money=n=>`${state.settings.language==='ru'?'$':'$'}${fmt(n)}`;
-const SAVE_KEY='skyport_tycoon_save_v1';
-const SETTINGS_KEY='skyport_tycoon_settings_v1';
-const showFatalError=(message)=>{
-  const loading=document.getElementById('loading');
-  const tip=document.getElementById('loadingTip');
-  const bar=document.getElementById('progressBar');
-  if(bar) bar.style.width='100%';
-  if(tip) tip.innerHTML=`<strong>Loading error.</strong><br>${message}<br><br>Try reloading the page. If it still fails, clear cache or open the newest file.`;
-  if(loading) loading.classList.remove('done');
-};
-window.addEventListener('error',e=>{ console.error(e.error||e.message); showFatalError((e.error&&e.error.message)||e.message||'Unknown error'); });
-window.addEventListener('unhandledrejection',e=>{ console.error(e.reason); showFatalError((e.reason&&e.reason.message)||String(e.reason)||'Unknown promise error'); });
+    const BUILDINGS={
+      gate2:{name:["Дополнительный гейт","Extra gate"],desc:["Принимает ещё один самолёт одновременно.","Handles one more aircraft at once."],cost:28000,level:2,icon:"plane",pos:[-3,-9],type:"gate"},
+      garden:{name:["Парк у терминала","Terminal park"],desc:["Украшение повышает настроение пассажиров.","Decoration improves passenger happiness."],cost:18000,level:1,icon:"sun",pos:[25,-43],type:"garden"},
+      parking2:{name:["Большая парковка","Large parking"],desc:["Даёт постоянный доход от посетителей.","Adds steady visitor parking income."],cost:44000,level:3,icon:"road",pos:[48,-54],type:"parking"},
+      roads:{name:["Новая развязка","Road interchange"],desc:["Увеличивает доход парковок и оживляет город.","Boosts parking income and city traffic."],cost:52000,level:3,icon:"road",pos:[0,-62],type:"roads"},
+      gate3:{name:["Третий гейт","Third gate"],desc:["Ещё одно место для обслуживания рейсов.","Another stand for simultaneous flights."],cost:69000,level:3,icon:"plane",pos:[27,-9],type:"gate"},
+      terminal2:{name:["Расширение терминала","Terminal extension"],desc:["Больше пассажиров и заметно крупнее здание.","More passengers and a visibly larger building."],cost:115000,level:4,icon:"terminal",pos:[34,-31],type:"terminal"},
+      fuel:{name:["Топливная станция","Fuel station"],desc:["Снижает расходы и ускоряет подготовку самолётов.","Reduces costs and speeds up turnarounds."],cost:78000,level:4,icon:"up",pos:[67,-4],type:"fuel"},
+      runway2:{name:["Вторая полоса","Second runway"],desc:["Удваивает пропускную способность аэропорта.","Doubles airport flight capacity."],cost:155000,level:5,icon:"flight",pos:[0,53],type:"runway"},
+      tower:{name:["Диспетчерская башня","Control tower"],desc:["Сокращает интервалы между прибывающими рейсами.","Shortens intervals between arriving flights."],cost:112000,level:5,icon:"terminal",pos:[72,-26],type:"tower"},
+      solar:{name:["Солнечный парк","Solar park"],desc:["Снижает обслуживание и красиво светится ночью.","Cuts maintenance and glows beautifully at night."],cost:93000,level:6,icon:"sun",pos:[-65,-47],type:"solar"},
+      hangar:{name:["Сервисный ангар","Service hangar"],desc:["Открывает крупные самолёты и улучшает доход.","Unlocks large aircraft and boosts income."],cost:175000,level:6,icon:"build",pos:[-62,-6],type:"hangar"}
+    };
+    const UPGRADES={
+      boarding:{name:["Быстрая посадка","Fast boarding"],desc:["Сокращает время посадки пассажиров.","Reduces passenger boarding time."],base:11500,max:5,icon:"users"},
+      ticket:{name:["Доход с билетов","Ticket revenue"],desc:["+12% дохода с каждого пассажира.","+12% income from every passenger."],base:14000,max:5,icon:"coins"},
+      runway:{name:["Покрытие полосы","Runway surface"],desc:["Быстрее посадка и взлёт самолётов.","Faster aircraft landing and takeoff."],base:17000,max:5,icon:"flight"},
+      maintenance:{name:["Умное обслуживание","Smart maintenance"],desc:["Снижает все регулярные расходы.","Reduces all recurring expenses."],base:15500,max:5,icon:"settings"},
+      happiness:{name:["Комфорт пассажиров","Passenger comfort"],desc:["Больше довольных пассажиров и чаевых.","Improves happiness and bonus income."],base:13000,max:5,icon:"star"},
+      turnaround:{name:["Наземная команда","Ground crew"],desc:["Ускоряет полный оборот самолёта.","Speeds up the full aircraft turnaround."],base:19000,max:5,icon:"up"}
+    };
+    const AIRCRAFT=[
+      {id:"business",name:["Бизнес-джет","Business jet"],min:1,cap:12,income:5200,scale:.68,color:0xf3f6f8,accent:0x316fe8},
+      {id:"turbo",name:["Турбовинтовой","Turboprop"],min:1,cap:38,income:7600,scale:.8,color:0xf9fafb,accent:0x24a47a,prop:true},
+      {id:"regional",name:["Региональный джет","Regional jet"],min:2,cap:72,income:11200,scale:.92,color:0xffffff,accent:0xff8b35},
+      {id:"small",name:["Малый авиалайнер","Small airliner"],min:3,cap:128,income:16600,scale:1.08,color:0xf7f8fb,accent:0x477de0},
+      {id:"cargo",name:["Грузовой самолёт","Cargo plane"],min:4,cap:54,income:21800,scale:1.14,color:0xdfe6ea,accent:0xe2a329,cargo:true},
+      {id:"large",name:["Большой авиалайнер","Large airliner"],min:6,cap:240,income:31500,scale:1.35,color:0xf9fbfc,accent:0xb549d9}
+    ];
+    const AIRLINES=[
+      {code:"SKY",name:"SkyWays",color:"#3c7cf1"},{code:"NOVA",name:"Nova Air",color:"#9b4ed1"},
+      {code:"JET",name:"Jetline",color:"#f08b35"},{code:"NORD",name:"Nordic",color:"#22a887"},
+      {code:"SUN",name:"Sunbird",color:"#e5aa28"},{code:"ALP",name:"Alpine",color:"#e65362"}
+    ];
+    const PHASE_RU={approach:"Заходит",landing:"Посадка",taxiIn:"К гейту",turnaround:"Посадка",pushback:"Буксировка",taxiOut:"На полосу",takeoff:"Взлёт"};
+    const PHASE_EN={approach:"Approach",landing:"Landing",taxiIn:"To gate",turnaround:"Boarding",pushback:"Pushback",taxiOut:"To runway",takeoff:"Takeoff"};
 
-const tips=[
-  'Faster turnaround means more flights and more income.',
-  'Parking earns steady passive income from every passenger.',
-  'Runway lights make your airport come alive at night.',
-  'Large aircraft pay more, but need better airport facilities.',
-  'Upgrades are permanent and affect every future flight.'
-];
+    function defaultState(){
+      return {version:4,money:85000,passengers:0,totalPassengers:0,flights:0,level:1,xp:0,day:1,time:480,
+        weather:"sunny",happiness:82,totalIncome:0,totalExpenses:0,playSeconds:0,speed:1,lang:"ru",
+        built:{},upgrades:{boarding:0,ticket:0,runway:0,maintenance:0,happiness:0,turnaround:0},
+        objective:0,objectiveBase:{flights:0,passengers:0},tutorialDone:false,achievements:{},history:[0,0,0,0,0,0,0,0,0,0],
+        settings:{music:26,sfx:60,quality:innerWidth<700?"medium":"high"},lastSave:Date.now()};
+    }
 
-const I18N={
-  en:{money:'Money',passengers:'Passengers',flights:'Flights',airportLevel:'Airport Level',build:'Build',upgrade:'Upgrade',statistics:'Statistics',settings:'Settings',buildAirport:'Build Airport',buildHint:'Choose a facility, then tap its glowing construction zone.',upgrades:'Upgrades',upgradeHint:'Permanent improvements with visible results.',airportStats:'Airport Statistics',statsHint:'A clear view of growth and efficiency.',settingsHint:'Tune sound, graphics and language.',musicVolume:'Music volume',effectsVolume:'Effects volume',graphics:'Graphics',language:'Language',manualSave:'Manual Save',resetSave:'Reset Save'},
-  ru:{money:'Деньги',passengers:'Пассажиры',flights:'Рейсы',airportLevel:'Уровень аэропорта',build:'Строить',upgrade:'Улучшения',statistics:'Статистика',settings:'Настройки',buildAirport:'Строительство',buildHint:'Выбери объект и нажми на светящуюся зону.',upgrades:'Улучшения',upgradeHint:'Постоянные улучшения с заметным эффектом.',airportStats:'Статистика аэропорта',statsHint:'Понятный обзор роста и эффективности.',settingsHint:'Настрой звук, графику и язык.',musicVolume:'Громкость музыки',effectsVolume:'Громкость эффектов',graphics:'Графика',language:'Язык',manualSave:'Сохранить',resetSave:'Сбросить сохранение'}
-};
+    class AudioBus{
+      constructor(){this.ctx=null;this.master=null;this.ambient=null}
+      start(){
+        if(this.ctx){if(this.ctx.state==="suspended")this.ctx.resume();return}
+        const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+        this.ctx=new AC();this.master=this.ctx.createGain();this.master.connect(this.ctx.destination);
+        this.ambient=this.ctx.createGain();this.ambient.gain.value=.012;this.ambient.connect(this.master);
+        const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type="sine";o.frequency.value=72;g.gain.value=.13;o.connect(g);g.connect(this.ambient);o.start();
+        const o2=this.ctx.createOscillator();o2.type="triangle";o2.frequency.value=118;o2.connect(this.ambient);o2.start();this.update();
+      }
+      update(){if(!this.ctx||!game)return;this.master.gain.value=.55;this.ambient.gain.value=(game.state.settings.music/100)*.055}
+      tone(freq=440,dur=.09,type="sine",vol=.08){
+        if(!this.ctx||!game||game.state.settings.sfx<=0)return;
+        const o=this.ctx.createOscillator(),g=this.ctx.createGain(),t=this.ctx.currentTime;
+        o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(vol*game.state.settings.sfx/100,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+        o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur);
+      }
+      click(){this.tone(520,.06,"sine",.06)}
+      cash(){this.tone(660,.13,"sine",.1);setTimeout(()=>this.tone(920,.16,"sine",.08),70)}
+      upgrade(){this.tone(420,.12,"triangle",.1);setTimeout(()=>this.tone(640,.14,"triangle",.1),90);setTimeout(()=>this.tone(880,.2,"sine",.08),180)}
+      landing(){this.tone(95,.45,"sawtooth",.08)}
+      takeoff(){this.tone(120,.7,"sawtooth",.07)}
+    }
 
-const DEFAULT_STATE=()=>({
-  money:35000,passengers:0,flights:0,level:1,xp:0,totalIncome:0,totalExpenses:0,playTime:0,
-  happiness:72,paused:false,lastSave:Date.now(),incomeHistory:Array(16).fill(0),
-  built:{terminal2:false,gate2:false,gate3:false,runway2:false,parking2:false,tower:false,fuel:false,decor:false,road:false},
-  upgrades:{boarding:0,runway:0,terminal:0,ticket:0,maintenance:0,happiness:0,turnaround:0},
-  settings:{music:35,effects:65,graphics:'high',language:'en'}
-});
-let state=DEFAULT_STATE();
-let scene,camera,renderer,composer,bloom,controls,clock,raycaster,pointer;
-let worldRoot,airportRoot,lightsRoot,weatherRoot,fxRoot,passengerRoot,aircraftRoot,constructionRoot;
-let sun,hemi,sky,ground,runway1,runway2,taxiways=[],gates=[],gateObjects=[],aircraft=[],passengers=[],vehicles=[],rainDrops,clouds=[];
-let activePlacement=null,placementGhost=null,placementZone=null,gameStarted=false,lastAutosave=0,lastEconomy=0,lastFlightSpawn=-20,lastHistory=0,lastWeatherPeriod=-1,worldTime=0.33,weather='Sunny';
-let audio=null,ambienceGain=null,musicGain=null,effectsGain=null;
+    class ParticlePool{
+      constructor(scene){
+        this.scene=scene;this.items=[];this.geo=new THREE.SphereGeometry(.17,6,6);
+        for(let i=0;i<100;i++){const m=new THREE.Mesh(this.geo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true}));m.visible=false;scene.add(m);this.items.push({m,v:new THREE.Vector3(),life:0,max:1})}
+      }
+      burst(pos,count,kind="spark"){
+        const colors=kind==="money"?[0x44dc9d,0xf4d35e,0xffffff]:kind==="smoke"?[0xffffff,0xcbd4db,0x9eabb5]:[0x5ca8ff,0xffd166,0x43d9a3,0xff6b8a];
+        let made=0;
+        for(const p of this.items){if(p.life>0)continue;p.life=p.max=.65+Math.random()*1.2;p.m.visible=true;p.m.position.copy(pos);p.m.material.color.setHex(colors[Math.floor(Math.random()*colors.length)]);p.m.material.opacity=kind==="smoke"?.5:1;
+          p.m.scale.setScalar(kind==="smoke"?1.5+Math.random():.6+Math.random());p.v.set((Math.random()-.5)*(kind==="smoke"?2:8),Math.random()*(kind==="smoke"?2.2:7)+1,(Math.random()-.5)*(kind==="smoke"?2:8));p.kind=kind;if(++made>=count)break}
+      }
+      update(dt){
+        for(const p of this.items){if(p.life<=0)continue;p.life-=dt;p.m.position.addScaledVector(p.v,dt);p.v.y-=dt*(p.kind==="smoke"?-.35:5.8);p.m.material.opacity=clamp(p.life/p.max,0,1)*(p.kind==="smoke"?.45:1);p.m.rotation.x+=dt*3;if(p.life<=0)p.m.visible=false}
+      }
+    }
 
-const BUILDINGS=[
-  {id:'terminal2',name:'Terminal Extension',desc:'Adds capacity and unlocks larger aircraft.',price:26000,level:2,icon:'T2',slot:new THREE.Vector3(19,0,5)},
-  {id:'gate2',name:'Gate 2',desc:'Allows another aircraft to be handled.',price:18000,level:2,icon:'G2',slot:new THREE.Vector3(5,0,-2)},
-  {id:'parking2',name:'Parking Expansion',desc:'Increases passive parking revenue.',price:14000,level:2,icon:'P+',slot:new THREE.Vector3(-25,0,18)},
-  {id:'tower',name:'Control Tower',desc:'Improves flight frequency and airport prestige.',price:32000,level:3,icon:'CT',slot:new THREE.Vector3(24,0,-6)},
-  {id:'fuel',name:'Fuel Station',desc:'Reduces flight servicing costs.',price:28000,level:3,icon:'F',slot:new THREE.Vector3(20,0,-15)},
-  {id:'gate3',name:'Gate 3',desc:'Expands peak-hour capacity.',price:34000,level:4,icon:'G3',slot:new THREE.Vector3(13,0,-2)},
-  {id:'road',name:'Road Upgrade',desc:'Adds a landscaped boulevard and more traffic.',price:22000,level:4,icon:'R',slot:new THREE.Vector3(-4,0,24)},
-  {id:'decor',name:'Airport Park',desc:'Raises passenger happiness and visual appeal.',price:19000,level:5,icon:'★',slot:new THREE.Vector3(25,0,18)},
-  {id:'runway2',name:'Second Runway',desc:'Unlocks the busiest international traffic.',price:90000,level:6,icon:'R2',slot:new THREE.Vector3(0,0,-36)}
-];
-const UPGRADES=[
-  {id:'boarding',name:'Faster Boarding',desc:'Passengers board 12% faster per level.',base:9000,max:5},
-  {id:'runway',name:'Better Runway',desc:'Shorter landing and takeoff cycles.',base:11000,max:5},
-  {id:'terminal',name:'Bigger Terminal',desc:'Raises passenger capacity and income.',base:12500,max:5},
-  {id:'ticket',name:'Premium Tickets',desc:'Increases passenger income by 10%.',base:14000,max:5},
-  {id:'maintenance',name:'Efficient Maintenance',desc:'Reduces airport expenses by 8%.',base:10000,max:5},
-  {id:'happiness',name:'Passenger Comfort',desc:'Improves happiness and tips.',base:8500,max:5},
-  {id:'turnaround',name:'Rapid Turnaround',desc:'Aircraft leave gates sooner.',base:16000,max:5}
-];
-const PLANE_TYPES=[
-  {id:'business',name:'Business Jet',unlock:1,size:.72,pax:[8,16],income:150,body:0xf4f7fb,accent:0x2a9dff,duration:38},
-  {id:'turboprop',name:'Turboprop',unlock:1,size:.84,pax:[28,48],income:115,body:0xffffff,accent:0x47c98c,duration:44,prop:true},
-  {id:'regional',name:'Regional Jet',unlock:2,size:1,pax:[52,80],income:125,body:0xeaf0f6,accent:0xff8e4c,duration:50},
-  {id:'airliner',name:'Small Airliner',unlock:3,size:1.18,pax:[90,140],income:132,body:0xffffff,accent:0x6c63ff,duration:58},
-  {id:'large',name:'Large Airliner',unlock:5,size:1.45,pax:[170,250],income:145,body:0xf7f7f7,accent:0x00b8a9,duration:68,requires:'terminal2'},
-  {id:'cargo',name:'Cargo Plane',unlock:4,size:1.25,pax:[40,85],income:245,body:0xbec9d6,accent:0xffd166,duration:62,cargo:true}
-];
+    class PassengerPool{
+      constructor(scene){
+        this.scene=scene;this.people=[];const skin=new THREE.MeshStandardMaterial({color:0xf1b38b,roughness:.8});
+        const colors=[0x3b75d6,0xe25d67,0x21a57c,0xd99b2b,0x7c59bb,0x455667];
+        for(let i=0;i<70;i++){
+          const g=new THREE.Group(),body=new THREE.Mesh(new THREE.CapsuleGeometry(.18,.42,3,6),new THREE.MeshStandardMaterial({color:colors[i%colors.length],roughness:.8})),head=new THREE.Mesh(new THREE.SphereGeometry(.15,8,7),skin);
+          body.position.y=.47;head.position.y=.92;g.add(body,head);g.visible=false;g.scale.setScalar(.86+Math.random()*.2);scene.add(g);this.people.push({g,t:0,dur:1,curve:null,active:false,phase:0})}
+      }
+      stream(gatePos,boarding,count){
+        const actual=Math.min(12,Math.max(4,Math.round(count/12)));
+        for(let i=0;i<actual;i++){
+          const p=this.people.find(x=>!x.active);if(!p)break;p.active=true;p.g.visible=true;p.t=-i*.16;p.dur=3.5+Math.random()*1.6;
+          const a=new THREE.Vector3(gatePos.x+(Math.random()-.5)*2,.13,gatePos.z-2),b=new THREE.Vector3(gatePos.x+(Math.random()-.5)*3,.13,-20),c=new THREE.Vector3(4+(Math.random()-.5)*4,.13,-24);
+          p.curve=new THREE.CatmullRomCurve3(boarding?[c,b,a]:[a,b,c]);p.phase=Math.random()*6.28;
+        }
+      }
+      update(dt){
+        for(const p of this.people){if(!p.active)continue;p.t+=dt/p.dur;if(p.t<0)continue;if(p.t>=1){p.active=false;p.g.visible=false;continue}
+          const pt=p.curve.getPoint(p.t),tan=p.curve.getTangent(p.t);p.g.position.copy(pt);p.g.position.y+=Math.abs(Math.sin(p.t*35+p.phase))*.05;p.g.rotation.y=-Math.atan2(tan.z,tan.x)+Math.PI/2;
+        }
+      }
+    }
 
-function loadState(){
-  try{
-    const raw=localStorage.getItem(SAVE_KEY);
-    const storedSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null');
-    if(!raw){if(storedSettings)state.settings={...state.settings,...storedSettings};return false}
-    const saved=JSON.parse(raw);state={...DEFAULT_STATE(),...saved,built:{...DEFAULT_STATE().built,...saved.built},upgrades:{...DEFAULT_STATE().upgrades,...saved.upgrades},settings:{...DEFAULT_STATE().settings,...saved.settings,...storedSettings}};return true
-  }catch(e){console.warn('Save load failed',e);return false}
-}
-function persistSettings(){localStorage.setItem(SETTINGS_KEY,JSON.stringify(state.settings))}
+    class Flight{
+      constructor(game,type,gate,runway,airline,num){
+        this.game=game;this.type=type;this.gate=gate;this.runway=runway;this.airline=airline;this.number=airline.code+" "+num;this.mesh=game.createAircraft(type,airline);this.mesh.userData.flight=this;game.scene.add(this.mesh);
+        this.phase="approach";this.t=0;this.smoked=false;this.served=false;this.setPhase("approach");
+      }
+      gatePoint(){return new THREE.Vector3(this.game.gates[this.gate].x,1.1,this.game.gates[this.gate].z)}
+      setPhase(name){
+        this.phase=name;this.t=0;const gp=this.gatePoint(),rz=this.runway===1?54:22,sp=1-this.game.state.upgrades.runway*.045,turn=(1-this.game.state.upgrades.turnaround*.07-this.game.state.upgrades.boarding*.04)*(this.game.state.built.fuel?.9:1);
+        const paths={
+          approach:[[-230,62,rz],[-170,28,rz],[-105,7,rz],[-84,2.1,rz]],
+          landing:[[-84,2.1,rz],[-62,1.1,rz],[16,1.1,rz],[70,1.1,rz]],
+          taxiIn:[[70,1.1,rz],[62,1.1,10],[45,1.1,5],[gp.x,1.1,5],[gp.x,1.1,gp.z]],
+          pushback:[[gp.x,1.1,gp.z],[gp.x,1.1,0],[gp.x-4,1.1,5]],
+          taxiOut:[[gp.x-4,1.1,5],[-64,1.1,7],[-74,1.1,rz]],
+          takeoff:[[-74,1.1,rz],[18,1.1,rz],[72,3.5,rz],[142,26,rz],[225,67,rz]]
+        };
+        const durations={approach:8*sp,landing:6*sp,taxiIn:6,turnaround:12*turn,pushback:3,taxiOut:8,takeoff:7*sp};
+        this.duration=Math.max(4,durations[name]||5);
+        if(paths[name])this.curve=new THREE.CatmullRomCurve3(paths[name].map(p=>new THREE.Vector3(...p)),false,"catmullrom",.2);
+        if(name==="turnaround"){
+          this.mesh.position.copy(gp);this.mesh.rotation.y=Math.PI/2;this.game.passengers.stream(gp,false,this.type.cap);
+          this.game.audio.tone(210,.12,"sine",.04);
+        }
+        this.game.updateFlightBoard();
+      }
+      update(dt){
+        this.t+=dt/this.duration;
+        if(this.phase==="turnaround"){
+          this.game.animateAircraftParts(this.mesh,dt,true);
+          if(this.t>.48&&!this.boarded){this.boarded=true;this.game.passengers.stream(this.gatePoint(),true,this.type.cap)}
+          if(this.t>=1){this.completeService();this.setPhase("pushback")}return;
+        }
+        const t=clamp(this.t,0,1),pt=this.curve.getPoint(ease(t)),tan=this.curve.getTangent(ease(t));
+        this.mesh.position.copy(pt);this.mesh.rotation.y=-Math.atan2(tan.z,tan.x);
+        if(this.phase==="approach")this.setGear(t>.38);
+        if(this.phase==="landing"&&!this.smoked&&t>.18){this.smoked=true;this.game.particles.burst(pt.clone().add(new THREE.Vector3(-2,0,0)),18,"smoke");this.game.audio.landing()}
+        if(this.phase==="takeoff"){this.setGear(t<.58);if(t>.18&&!this.takeoffSound){this.takeoffSound=true;this.game.audio.takeoff()}}
+        this.game.animateAircraftParts(this.mesh,dt,false);
+        if(this.t>=1)this.next();
+      }
+      setGear(show){for(const w of this.mesh.userData.wheels||[])w.visible=show}
+      completeService(){
+        if(this.served)return;this.served=true;const s=this.game.state,load=.72+Math.random()*.27,pass=Math.round(this.type.cap*load);
+        const ticket=1+s.upgrades.ticket*.12,happy=.85+(s.happiness+s.upgrades.happiness*2+(s.built.garden?4:0))/520,income=Math.round(this.type.income*ticket*happy);
+        s.money+=income;s.passengers+=pass;s.totalPassengers+=pass;s.flights++;s.totalIncome+=income;s.xp+=38+Math.round(pass/5);this.game.dailyIncome+=income;
+        this.game.particles.burst(this.gatePoint().add(new THREE.Vector3(0,2,0)),20,"money");this.game.floatMoney(income);this.game.audio.cash();this.game.toast(tr("Рейс "+this.number+" обслужен","Flight "+this.number+" completed"),tr("+"+money(income)+" · "+pass+" пассажиров","+"+money(income)+" · "+pass+" passengers"),"good");
+        this.game.checkProgress();this.game.ui();
+      }
+      next(){
+        const order=["approach","landing","taxiIn","turnaround","pushback","taxiOut","takeoff"],i=order.indexOf(this.phase);
+        if(i===order.length-1){this.game.finishFlight(this);return}
+        this.setPhase(order[i+1]);
+      }
+      dispose(){this.mesh.traverse(o=>{if(o.isMesh){o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}});this.game.scene.remove(this.mesh)}
+    }
 
-function saveState(show=false){
-  state.lastSave=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));if(show){toast('Airport saved','Your progress is safely stored.');playSfx('save')}
-  $('#continueBtn').disabled=false;
-}
+    class AirportGame{
+      constructor(){
+        this.state=defaultState();this.audio=new AudioBus();this.flights=[];this.clock=new THREE.Clock();this.active=false;this.dailyIncome=0;this.spawnTimer=2;this.economyTimer=0;this.saveTimer=0;this.weatherTimer=50;this.uiTimer=0;this.gameSpeed=1;this.buildMode=null;this.historyTimer=0;this.pointerDown={x:0,y:0};
+        this.gates=[{x:-31,z:-8},{x:-3,z:-8},{x:27,z:-8},{x:49,z:-8}];
+        this.initThree();this.buildWorld();this.particles=new ParticlePool(this.scene);this.passengers=new PassengerPool(this.scene);this.bindUI();this.applyLanguage();this.applyQuality();this.animate();
+      }
+      initThree(){
+        this.scene=new THREE.Scene();this.scene.fog=new THREE.FogExp2(0xb9d9ea,.0032);
+        this.camera=new THREE.PerspectiveCamera(44,innerWidth/innerHeight,.1,700);this.camera.position.set(92,85,115);
+        const probe=document.createElement("canvas");let gl=null;try{gl=probe.getContext("webgl2",{failIfMajorPerformanceCaveat:true})||probe.getContext("webgl",{failIfMajorPerformanceCaveat:true})}catch(e){}this.webgl=!!gl;
+        if(this.webgl){this.renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance",alpha:false});this.renderer.setSize(innerWidth,innerHeight);this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.02}
+        else this.renderer=this.fallbackRenderer();
+        $("#scene").appendChild(this.renderer.domElement);
+        this.controls=new OrbitControls(this.camera,this.renderer.domElement);this.controls.enableDamping=true;this.controls.dampingFactor=.07;this.controls.target.set(0,0,-4);this.controls.minDistance=45;this.controls.maxDistance=235;this.controls.maxPolarAngle=Math.PI*.47;this.controls.minPolarAngle=.25;this.controls.screenSpacePanning=false;this.controls.touches.ONE=THREE.TOUCH.ROTATE;this.controls.touches.TWO=THREE.TOUCH.DOLLY_PAN;
+        this.hemi=new THREE.HemisphereLight(0xd7efff,0x526f45,2.15);this.scene.add(this.hemi);
+        this.sun=new THREE.DirectionalLight(0xfff3da,3.1);this.sun.position.set(-85,120,-65);this.sun.castShadow=true;this.sun.shadow.mapSize.set(2048,2048);this.sun.shadow.camera.left=-130;this.sun.shadow.camera.right=130;this.sun.shadow.camera.top=115;this.sun.shadow.camera.bottom=-115;this.sun.shadow.camera.far=350;this.sun.shadow.bias=-.00025;this.scene.add(this.sun);
+        if(this.webgl){this.composer=new EffectComposer(this.renderer);this.composer.addPass(new RenderPass(this.scene,this.camera));this.bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.28,.5,.86);this.composer.addPass(this.bloom)}
+        else{this.composer={setSize(){},render(){}};this.bloom={enabled:false}}
+        this.ray=new THREE.Raycaster();this.pointer=new THREE.Vector2();
+        this.renderer.domElement.addEventListener("pointerdown",e=>{this.pointerDown={x:e.clientX,y:e.clientY}});
+        this.renderer.domElement.addEventListener("pointermove",e=>this.onScenePointer(e,false));
+        this.renderer.domElement.addEventListener("pointerup",e=>{if(Math.hypot(e.clientX-this.pointerDown.x,e.clientY-this.pointerDown.y)<8)this.onScenePointer(e,true)});
+        addEventListener("resize",()=>this.resize());
+      }
+      fallbackRenderer(){
+        const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d"),draw=()=>{
+          const w=canvas.width,h=canvas.height,g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,"#75baf0");g.addColorStop(.56,"#d8effb");g.addColorStop(.561,"#8bbb71");g.addColorStop(1,"#6f9f5b");ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+          ctx.save();ctx.translate(w*.53,h*.62);ctx.transform(1,.22,-1,.22,0,0);ctx.fillStyle="#3d464d";ctx.fillRect(-w*.3,-42,w*.62,84);ctx.fillStyle="#eef2e9";for(let x=-w*.27;x<w*.28;x+=55)ctx.fillRect(x,-2,29,4);ctx.fillStyle="#939ba0";ctx.fillRect(-w*.22,-125,w*.4,70);ctx.fillStyle="#e7ecef";ctx.fillRect(-w*.08,-205,w*.28,72);ctx.fillStyle="#4d83a0";for(let x=-w*.06;x<w*.18;x+=30)ctx.fillRect(x,-193,18,36);ctx.restore();
+        };return{domElement:canvas,shadowMap:{enabled:false,type:0},toneMappingExposure:1,setPixelRatio(){},setSize(w,h){canvas.width=Math.max(1,w);canvas.height=Math.max(1,h);draw()},render(){},draw};
+      }
+      mat(color,rough=.72,metal=.05,extra={}){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,...extra})}
+      mesh(geo,mat,parent=this.scene,shadow=true){const m=new THREE.Mesh(geo,mat);m.castShadow=shadow;m.receiveShadow=shadow;parent.add(m);return m}
+      buildWorld(){
+        this.world=new THREE.Group();this.scene.add(this.world);this.dynamicLights=[];this.windowMats=[];this.props=[];
+        const skyGeo=new THREE.SphereGeometry(360,32,18),skyMat=new THREE.ShaderMaterial({side:THREE.BackSide,uniforms:{top:{value:new THREE.Color(0x56aaf2)},bottom:{value:new THREE.Color(0xeaf7ff)},night:{value:0}},vertexShader:"varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",fragmentShader:"uniform vec3 top;uniform vec3 bottom;uniform float night;varying vec3 vPos;void main(){float h=normalize(vPos).y*.5+.5;vec3 c=mix(bottom,top,smoothstep(.05,.85,h));c=mix(c,vec3(.018,.035,.075),night);gl_FragColor=vec4(c,1.0);}"});this.skyMat=skyMat;this.mesh(skyGeo,skyMat,this.scene,false);
+        const grassTex=this.makeGrassTexture(),ground=this.mesh(new THREE.PlaneGeometry(300,230),new THREE.MeshStandardMaterial({map:grassTex,color:0x83b86b,roughness:1}),this.world);ground.rotation.x=-Math.PI/2;ground.position.y=-.08;ground.name="ground";
+        this.buildRoads();this.addRunway(22,false);this.addTerminal();this.addParking(-35,-52,false);this.addTrees();this.addCity();this.addClouds();this.addRain();this.addVehicles();this.addBaggageCarts();
+      }
+      makeGrassTexture(){
+        const c=document.createElement("canvas");c.width=c.height=256;const x=c.getContext("2d");x.fillStyle="#91bd78";x.fillRect(0,0,256,256);
+        for(let i=0;i<4200;i++){const g=110+Math.random()*45;x.fillStyle="rgba("+Math.round(g*.65)+","+Math.round(g)+","+Math.round(g*.52)+",.16)";x.fillRect(Math.random()*256,Math.random()*256,1,1)}
+        const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(12,9);t.colorSpace=THREE.SRGBColorSpace;return t;
+      }
+      buildRoads(){
+        const asphalt=this.mat(0x37424a,.95),road=this.mesh(new THREE.PlaneGeometry(205,11),asphalt,this.world);road.rotation.x=-Math.PI/2;road.position.set(0,.02,-66);
+        for(let x=-96;x<100;x+=11){const l=this.mesh(new THREE.PlaneGeometry(5,.18),this.mat(0xe9e8d7,.7),this.world,false);l.rotation.x=-Math.PI/2;l.position.set(x,.04,-66)}
+        const access=this.mesh(new THREE.PlaneGeometry(11,38),asphalt,this.world);access.rotation.x=-Math.PI/2;access.position.set(2,.02,-48);
+      }
+      addRunway(z,second){
+        const group=new THREE.Group();group.name=second?"runway2":"runway1";this.world.add(group);
+        const strip=this.mesh(new THREE.PlaneGeometry(190,15),this.mat(0x30373c,.96),group);strip.rotation.x=-Math.PI/2;strip.position.set(0,.015,z);
+        for(let x=-80;x<=80;x+=15){const mark=this.mesh(new THREE.PlaneGeometry(7,.38),this.mat(0xf3f1df,.7),group,false);mark.rotation.x=-Math.PI/2;mark.position.set(x,.035,z)}
+        for(const x of [-87,-84,-81,81,84,87]){for(const dz of [-3.2,0,3.2]){const m=this.mesh(new THREE.PlaneGeometry(2.1,.35),this.mat(0xffffff,.6),group,false);m.rotation.x=-Math.PI/2;m.position.set(x,.04,z+dz)}}
+        const lightMat=new THREE.MeshStandardMaterial({color:0xb9eaff,emissive:0x55bbff,emissiveIntensity:.8});
+        for(let x=-92;x<=92;x+=6)for(const dz of [-7.25,7.25]){const l=this.mesh(new THREE.SphereGeometry(.12,6,5),lightMat,group,false);l.position.set(x,.18,z+dz);this.dynamicLights.push(l)}
+        const taxi=this.mesh(new THREE.PlaneGeometry(140,6),this.mat(0x465057,.95),group);taxi.rotation.x=-Math.PI/2;taxi.position.set(-2,.01,z-15);
+        for(let x=-68;x<68;x+=8){const d=this.mesh(new THREE.PlaneGeometry(2,.16),this.mat(0xf1c94e,.8),group,false);d.rotation.x=-Math.PI/2;d.position.set(x,.04,z-15)}
+        group.scale.set(.01,.01,.01);this.popIn(group,.8);
+      }
+      addTerminal(){
+        const g=new THREE.Group();g.name="terminal";this.world.add(g);const white=this.mat(0xe9eef1,.62,.12),dark=this.mat(0x3d4a54,.55,.35),glass=this.mat(0x68a9c8,.25,.18,{transparent:true,opacity:.78});
+        const base=this.mesh(new THREE.BoxGeometry(73,8,15),white,g);base.position.set(2,4,-31);
+        const roof=this.mesh(new THREE.BoxGeometry(75,1.1,17),dark,g);roof.position.set(2,8.4,-31);
+        const windowMat=new THREE.MeshStandardMaterial({color:0x78b4cf,roughness:.22,metalness:.15,emissive:0xffc875,emissiveIntensity:.08,transparent:true,opacity:.82});this.windowMats.push(windowMat);
+        for(let x=-30;x<=34;x+=7){const w=this.mesh(new THREE.BoxGeometry(4.8,4.5,.18),windowMat,g,false);w.position.set(x,4.5,-23.42)}
+        const entry=this.mesh(new THREE.BoxGeometry(12,4,2),glass,g);entry.position.set(2,2.1,-39);
+        const sign=this.mesh(new THREE.BoxGeometry(17,1.1,.28),this.mat(0x2b6fe8,.38,.1,{emissive:0x1f66d9,emissiveIntensity:.3}),g,false);sign.position.set(2,7,-22.9);
+        for(const gate of this.gates.slice(0,1))this.addJetBridge(gate.x,gate.z);
+        const apron=this.mesh(new THREE.PlaneGeometry(125,26),this.mat(0x8b9397,.92),g);apron.rotation.x=-Math.PI/2;apron.position.set(0,.01,-8);
+        for(const gate of this.gates){const line=this.mesh(new THREE.RingGeometry(4.2,4.38,32,1,0,Math.PI),this.mat(0xf0ca44,.8),g,false);line.rotation.x=-Math.PI/2;line.rotation.z=Math.PI;line.position.set(gate.x,.04,gate.z)}
+      }
+      addJetBridge(x,z,parent=this.world){
+        const g=new THREE.Group();parent.add(g);const body=this.mesh(new THREE.BoxGeometry(8,2.2,2.2),this.mat(0xdce3e7,.7,.18),g);body.position.set(x,3,-20);const pivot=this.mesh(new THREE.CylinderGeometry(1.5,1.5,3.5,12),this.mat(0xaebbc3,.7,.15),g);pivot.position.set(x,1.8,-21);const tunnel=this.mesh(new THREE.BoxGeometry(2.2,2,9),this.mat(0xd9e1e5,.65,.2),g);tunnel.position.set(x,3,-15.5);tunnel.rotation.y=.04;
+      }
+      addParking(x,z,big){
+        const g=new THREE.Group();this.world.add(g);const w=big?50:37,d=big?26:22,lot=this.mesh(new THREE.PlaneGeometry(w,d),this.mat(0x444e54,.94),g);lot.rotation.x=-Math.PI/2;lot.position.set(x,.02,z);
+        const rows=big?6:4;for(let i=0;i<rows;i++){const line=this.mesh(new THREE.PlaneGeometry(.16,d-3),this.mat(0xf2f0dc,.7),g,false);line.rotation.x=-Math.PI/2;line.position.set(x-w/2+5+i*(w-10)/(rows-1),.04,z)}
+        for(let i=0;i<(big?14:8);i++){const car=this.makeCar([0x3977d9,0xeceff1,0xe14e55,0x23292d,0xf0ab35][i%5]);car.scale.setScalar(.68);car.position.set(x-w/2+4+(i%rows)*(w-8)/(rows-1),.55,z-d/2+4+Math.floor(i/rows)*8);car.rotation.y=Math.PI/2;g.add(car)}
+      }
+      addTrees(){
+        const trunkGeo=new THREE.CylinderGeometry(.18,.26,1.7,6),leafGeo=new THREE.IcosahedronGeometry(1.25,1),trunkMat=this.mat(0x76563a,1),leafMat=this.mat(0x4f9651,.95);
+        const trunks=new THREE.InstancedMesh(trunkGeo,trunkMat,90),leaves=new THREE.InstancedMesh(leafGeo,leafMat,90),dummy=new THREE.Object3D();trunks.castShadow=leaves.castShadow=true;trunks.receiveShadow=leaves.receiveShadow=true;
+        for(let i=0;i<90;i++){let x,z;do{x=-137+Math.random()*274;z=-103+Math.random()*206}while((Math.abs(z-22)<24&&Math.abs(x)<105)||(z<-38&&z>-75&&Math.abs(x)<110)||(z>-25&&z<8&&Math.abs(x)<80));const s=.65+Math.random()*.65;dummy.position.set(x,.85*s,z);dummy.scale.set(s,s,s);dummy.rotation.y=Math.random()*6.28;dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);dummy.position.y=2.35*s;dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix)}
+        this.world.add(trunks,leaves);
+      }
+      addCity(){
+        const mats=[this.mat(0xc8d0d5,.9),this.mat(0xd9cab9,.9),this.mat(0xb9c7d2,.9)];
+        for(let i=0;i<24;i++){const w=6+Math.random()*9,h=5+Math.random()*18,d=5+Math.random()*9,b=this.mesh(new THREE.BoxGeometry(w,h,d),mats[i%3],this.world);b.position.set(-125+Math.random()*250,h/2,90+Math.random()*17)}
+      }
+      addClouds(){
+        this.clouds=[];const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,transparent:true,opacity:.72,depthWrite:false});
+        for(let i=0;i<10;i++){const g=new THREE.Group();for(let j=0;j<5;j++){const s=this.mesh(new THREE.SphereGeometry(4+Math.random()*4,9,7),mat,g,false);s.position.set(j*5+(Math.random()-0.5)*4,Math.random()*2,(Math.random()-.5)*4)}g.position.set(-170+Math.random()*340,55+Math.random()*30,-100+Math.random()*190);g.scale.setScalar(.7+Math.random());this.scene.add(g);this.clouds.push(g)}
+      }
+      addRain(){
+        const count=1100,pos=new Float32Array(count*3);for(let i=0;i<count;i++){pos[i*3]=(Math.random()-.5)*240;pos[i*3+1]=Math.random()*80;pos[i*3+2]=(Math.random()-.5)*180}
+        const geo=new THREE.BufferGeometry();geo.setAttribute("position",new THREE.BufferAttribute(pos,3));this.rain=new THREE.Points(geo,new THREE.PointsMaterial({color:0xaad8f2,size:.18,transparent:true,opacity:.58}));this.rain.visible=false;this.scene.add(this.rain);
+      }
+      makeCar(color=0x3a78d4){
+        const g=new THREE.Group(),body=this.mesh(new THREE.BoxGeometry(3.2,.75,1.55),this.mat(color,.38,.28),g),cab=this.mesh(new THREE.BoxGeometry(1.7,.65,1.35),this.mat(0xa9c5d4,.22,.35),g);body.position.y=.55;cab.position.set(-.1,1.15,0);for(const x of [-1,1])for(const z of [-.73,.73]){const w=this.mesh(new THREE.CylinderGeometry(.28,.28,.18,10),this.mat(0x1c2328,.9),g);w.rotation.x=Math.PI/2;w.position.set(x,.32,z)}return g;
+      }
+      addVehicles(){
+        this.vehicles=[];for(let i=0;i<8;i++){const c=this.makeCar([0x3b78d5,0xe34f59,0xf3f3f0,0x2b333a,0xd6a233][i%5]);c.scale.setScalar(.58);c.userData.t=i/8;c.userData.speed=.018+Math.random()*.008;c.position.y=.03;this.world.add(c);this.vehicles.push(c)}
+      }
+      addBaggageCarts(){
+        this.carts=[];for(let i=0;i<4;i++){const g=new THREE.Group(),cab=this.mesh(new THREE.BoxGeometry(1.7,.8,1.1),this.mat(0xf1c84a,.65,.15),g),trail=this.mesh(new THREE.BoxGeometry(2.3,.5,1.3),this.mat(0xc9d0d4,.8,.1),g);cab.position.y=.5;trail.position.set(-2.4,.42,0);g.userData.t=i/4;g.userData.speed=.025+i*.002;g.scale.setScalar(.72);this.world.add(g);this.carts.push(g)}
+      }
+      createAircraft(type,airline){
+        const s=type.scale,g=new THREE.Group(),white=this.mat(type.color,.32,.28),accent=this.mat(new THREE.Color(airline.color),.38,.24),dark=this.mat(0x172531,.28,.42),metal=this.mat(0x8b969e,.3,.72);
+        const body=this.mesh(new THREE.CylinderGeometry(1.08,1.08,10.8,18),white,g);body.rotation.z=Math.PI/2;
+        const nose=this.mesh(new THREE.ConeGeometry(1.08,2.5,18),white,g);nose.rotation.z=-Math.PI/2;nose.position.x=6.65;
+        const tail=this.mesh(new THREE.ConeGeometry(.86,2.5,18),white,g);tail.rotation.z=Math.PI/2;tail.position.x=-6.65;
+        const wing=this.mesh(new THREE.BoxGeometry(4.5,.19,12.5),white,g);wing.position.x=-.4;
+        const tailWing=this.mesh(new THREE.BoxGeometry(2.2,.14,5),accent,g);tailWing.position.set(-5.2,.25,0);
+        const fin=this.mesh(new THREE.BoxGeometry(2.7,3.1,.18),accent,g);fin.position.set(-4.9,1.55,0);fin.rotation.z=-.38;
+        const stripe=this.mesh(new THREE.BoxGeometry(8.7,.13,2.18),accent,g,false);stripe.position.set(-.4,-.02,0);
+        const cockpit=this.mesh(new THREE.BoxGeometry(.9,.55,1.82),dark,g,false);cockpit.position.set(5.7,.48,0);
+        for(let i=-3;i<=3;i++){for(const z of [-1.04,1.04]){const win=this.mesh(new THREE.BoxGeometry(.37,.26,.08),dark,g,false);win.position.set(i*.95+.4,.45,z)}}
+        const wheels=[];for(const p of [[-1,-1.1,-1.25],[-1,-1.1,1.25],[4.6,-.85,0]]){const w=this.mesh(new THREE.CylinderGeometry(.28,.28,.18,10),dark,g);w.rotation.x=Math.PI/2;w.position.set(...p);wheels.push(w)}
+        for(const z of [-3.4,3.4]){const eng=this.mesh(new THREE.CylinderGeometry(.62,.75,2.2,14),metal,g);eng.rotation.z=Math.PI/2;eng.position.set(.2,-.45,z);const fan=this.mesh(new THREE.CircleGeometry(.53,12),dark,g,false);fan.rotation.y=Math.PI/2;fan.position.set(1.32,-.45,z);fan.userData.prop=!!type.prop;g.userData.props=(g.userData.props||[]).concat(fan)}
+        const red=new THREE.MeshBasicMaterial({color:0xff334f}),green=new THREE.MeshBasicMaterial({color:0x55ffaf});const l1=this.mesh(new THREE.SphereGeometry(.13,6,5),red,g,false),l2=this.mesh(new THREE.SphereGeometry(.13,6,5),green,g,false);l1.position.set(-.3,.1,6.3);l2.position.set(-.3,.1,-6.3);g.userData.nav=[l1,l2];
+        g.scale.setScalar(s);g.userData.wheels=wheels;g.userData.type=type;g.userData.blink=0;return g;
+      }
+      animateAircraftParts(mesh,dt,idle){
+        mesh.userData.blink+=dt;const on=Math.sin(mesh.userData.blink*5)>0;for(const n of mesh.userData.nav||[])n.visible=on;
+        for(const p of mesh.userData.props||[])if(p.userData.prop)p.rotation.x+=dt*18;
+        if(idle)mesh.position.y=1.1+Math.sin(performance.now()*.002)*.02;
+      }
+      popIn(obj,dur=.5){obj.userData.pop={t:0,dur,target:new THREE.Vector3(1,1,1)};obj.scale.setScalar(.01)}
+      addExpansion(id){
+        const d=BUILDINGS[id];if(!d)return;const [x,z]=d.pos;if(d.type==="runway"){this.addRunway(z,true);return}const g=new THREE.Group();g.name=id;this.world.add(g);
+        if(d.type==="gate"){this.addJetBridge(x,z,g);const mark=this.mesh(new THREE.RingGeometry(4.2,4.38,32,1,0,Math.PI),this.mat(0xf0ca44,.8),g,false);mark.rotation.x=-Math.PI/2;mark.rotation.z=Math.PI;mark.position.set(x,.04,z)}
+        if(d.type==="garden"){const pad=this.mesh(new THREE.CylinderGeometry(8,8,.35,28),this.mat(0x83b96f,.95),g);pad.position.set(x,.15,z);for(let i=0;i<9;i++){const crown=this.mesh(new THREE.IcosahedronGeometry(.8+Math.random()*.5,1),this.mat(0x3d9959,.9),g);crown.position.set(x+(Math.random()-.5)*11,1,z+(Math.random()-.5)*9)}const fountain=this.mesh(new THREE.CylinderGeometry(2,2,.7,20),this.mat(0xb7c5cc,.35,.35),g);fountain.position.set(x,.35,z)}
+        if(d.type==="parking")this.addParking(x,z,true);
+        if(d.type==="roads"){const fly=this.mesh(new THREE.BoxGeometry(130,.8,8),this.mat(0x3b454b,.9),g);fly.position.set(x,2.2,z);for(let px=-55;px<=55;px+=22){const post=this.mesh(new THREE.BoxGeometry(1,4,1),this.mat(0x9da8ae,.8),g);post.position.set(px,0,z)}}
+        if(d.type==="terminal"){const main=this.mesh(new THREE.BoxGeometry(42,10,17),this.mat(0xe7ecef,.6,.15),g);main.position.set(x,5,z);const glass=this.mat(0x69afcc,.2,.25,{emissive:0xffc56a,emissiveIntensity:.08,transparent:true,opacity:.75});this.windowMats.push(glass);for(let px=x-16;px<=x+16;px+=6){const w=this.mesh(new THREE.BoxGeometry(4,5,.2),glass,g,false);w.position.set(px,5,z+8.6)}}
+        if(d.type==="fuel"){for(let i=0;i<3;i++){const tank=this.mesh(new THREE.CylinderGeometry(2.8,2.8,5.5,18),this.mat(0xe7ecef,.35,.55),g);tank.position.set(x+i*7,2.8,z)}const shed=this.mesh(new THREE.BoxGeometry(24,.5,9),this.mat(0x2874c8,.42,.4),g);shed.position.set(x+7,6,z)}
+        if(d.type==="tower"){const base=this.mesh(new THREE.CylinderGeometry(2.2,3.2,18,10),this.mat(0xd4dce0,.65,.2),g);base.position.set(x,9,z);const top=this.mesh(new THREE.CylinderGeometry(5,4,4,10),this.mat(0x4b839a,.2,.45,{transparent:true,opacity:.85}),g);top.position.set(x,19,z);const roof=this.mesh(new THREE.CylinderGeometry(5.5,5.5,.6,10),this.mat(0x303d47,.45,.45),g);roof.position.set(x,21.2,z)}
+        if(d.type==="solar"){for(let ix=0;ix<5;ix++)for(let iz=0;iz<3;iz++){const panel=this.mesh(new THREE.BoxGeometry(5,.25,3),this.mat(0x1a4f7a,.18,.7,{emissive:0x0a2a45,emissiveIntensity:.15}),g);panel.position.set(x-12+ix*6,.9,z-5+iz*4);panel.rotation.x=-.25}}
+        if(d.type==="hangar"){const hall=this.mesh(new THREE.BoxGeometry(31,11,22),this.mat(0xc8d2d8,.65,.3),g);hall.position.set(x,5.5,z);const door=this.mesh(new THREE.BoxGeometry(18,8,.25),this.mat(0x4b5962,.8,.2),g);door.position.set(x,4,z+11.1)}
+        g.scale.setScalar(.01);this.popIn(g,.65);
+      }
+      applyLoadedWorld(){for(const id in this.state.built)if(this.state.built[id])this.addExpansion(id)}
+      availableGates(){return 1+(this.state.built.gate2?1:0)+(this.state.built.gate3?1:0)+(this.state.built.terminal2?1:0)}
+      freeGate(){for(let i=0;i<this.availableGates();i++)if(!this.flights.some(f=>f.gate===i))return i;return-1}
+      spawnFlight(force=false){
+        if(!this.active)return;const gate=this.freeGate();if(gate<0)return;const max=this.state.built.runway2?4:3;if(this.flights.length>=max&&!force)return;
+        const types=AIRCRAFT.filter(a=>a.min<=this.state.level&&(a.id!=="large"||this.state.built.hangar));const type=types[Math.floor(Math.random()*types.length)],air=AIRLINES[Math.floor(Math.random()*AIRLINES.length)],runway=this.state.built.runway2&&Math.random()>.52?1:0;
+        const f=new Flight(this,type,gate,runway,air,100+Math.floor(Math.random()*890));this.flights.push(f);this.updateFlightBoard();this.toast(tr("Новый рейс","New flight"),f.number+" · "+tr(type.name[0],type.name[1]));
+      }
+      finishFlight(f){const i=this.flights.indexOf(f);if(i>=0)this.flights.splice(i,1);f.dispose();this.updateFlightBoard()}
+      updateFlightBoard(){
+        if(!$("#flightList"))return;$("#flightLive").textContent=this.flights.length+" "+tr("в работе","active");
+        if(!this.flights.length){$("#flightList").innerHTML='<div class="empty-flights">'+tr("Ожидаем следующий рейс…","Waiting for next flight…")+"</div>";return}
+        $("#flightList").innerHTML=this.flights.slice(0,4).map(f=>'<div class="flight-row"><span class="airline-logo" style="background:'+f.airline.color+'">'+f.airline.code.slice(0,2)+'</span><span class="flight-info"><strong>'+f.number+'</strong><small>'+tr(f.type.name[0],f.type.name[1])+' · G'+(f.gate+1)+'</small></span><span class="flight-phase">'+(this.state.lang==="en"?PHASE_EN[f.phase]:PHASE_RU[f.phase])+"</span></div>").join("");
+      }
+      spawnInterval(){return Math.max(8,17-this.state.level*.7-this.state.upgrades.turnaround*.4-(this.state.built.tower?2.5:0))}
+      update(dt){
+        this.controls.update();this.updateWorld(dt);
+        if(!this.active||this.gameSpeed===0){this.particles.update(dt);this.passengers.update(dt);return}
+        const d=dt*this.gameSpeed;this.state.playSeconds+=d;this.state.time+=d*5.5;if(this.state.time>=1440){this.state.time-=1440;this.state.day++;this.state.passengers=0;this.dailyIncome=0}
+        this.spawnTimer-=d;if(this.spawnTimer<=0){this.spawnFlight();this.spawnTimer=this.spawnInterval()}
+        for(const f of [...this.flights])f.update(d);
+        this.particles.update(d);this.passengers.update(d);this.economyTimer+=d;this.saveTimer+=d;this.uiTimer+=d;this.weatherTimer-=d;this.historyTimer+=d;
+        if(this.economyTimer>10){this.economyTimer=0;this.expenses()}
+        if(this.saveTimer>15){this.saveTimer=0;this.save(false)}
+        if(this.uiTimer>.4){this.uiTimer=0;this.ui();this.updateFlightBoard()}
+        if(this.weatherTimer<=0){this.weatherTimer=75+Math.random()*45;this.setWeather(["sunny","sunny","cloudy","rain"][Math.floor(Math.random()*4)])}
+        if(this.historyTimer>12){this.historyTimer=0;this.state.history.push(this.dailyIncome);this.state.history=this.state.history.slice(-10)}
+      }
+      updateWorld(dt){
+        const t=this.state.time/1440*Math.PI*2,daylight=clamp(Math.sin(t-Math.PI/2)*1.35+.35,0,1),night=1-daylight;
+        this.sun.position.set(Math.cos(t)*120,15+Math.max(0,Math.sin(t))*130,Math.sin(t)*80);this.sun.intensity=.15+daylight*3.05;this.hemi.intensity=.35+daylight*1.8;this.skyMat.uniforms.night.value=night*.93;
+        this.scene.fog.color.set(daylight>.25?0xb8d8e7:0x111b2b);this.renderer.toneMappingExposure=.58+daylight*.5;
+        for(const m of this.windowMats)m.emissiveIntensity=.08+night*2.2;for(const l of this.dynamicLights)l.material.emissiveIntensity=.5+night*5;
+        for(const c of this.clouds){c.position.x+=dt*(this.state.weather==="rain"?1.8:1);if(c.position.x>190)c.position.x=-190;c.visible=this.state.weather!=="sunny"||night<.9}
+        if(this.rain.visible){const a=this.rain.geometry.attributes.position;for(let i=0;i<a.count;i++){a.array[i*3+1]-=dt*34;if(a.array[i*3+1]<0)a.array[i*3+1]=80}a.needsUpdate=true}
+        for(const c of this.vehicles){c.userData.t=(c.userData.t+dt*c.userData.speed)%1;const x=-100+c.userData.t*200,lane=Math.floor(c.userData.t*2)%2;c.position.set(lane?x:-x,.02,-66+(lane?2.3:-2.3));c.rotation.y=lane?0:Math.PI}
+        for(const c of this.carts){c.userData.t=(c.userData.t+dt*c.userData.speed)%1;const a=c.userData.t*Math.PI*2;c.position.set(Math.cos(a)*45,.05,-7+Math.sin(a)*8);c.rotation.y=-a+Math.PI/2}
+        this.world.traverse(o=>{if(o.userData.pop){o.userData.pop.t+=dt;const p=clamp(o.userData.pop.t/o.userData.pop.dur,0,1),s=1+Math.sin(p*Math.PI)*.12;o.scale.copy(o.userData.pop.target).multiplyScalar(ease(p)*s);if(p>=1)delete o.userData.pop}})
+        $("#menuWeather").textContent=(this.state.weather==="rain"?"Дождь":this.state.weather==="cloudy"?"Облачно":"Ясно")+" · "+this.formatTime();
+      }
+      expenses(){
+        const s=this.state,parking=Math.round((55+(s.built.parking2?190:0))*(s.built.roads?1.45:1)),base=210+this.flights.length*95+Object.keys(s.built).length*34,reduction=1-s.upgrades.maintenance*.07-(s.built.solar?.1:0)-(s.built.fuel?.06:0),amount=Math.max(90,Math.round(base*reduction));
+        s.money=Math.max(0,s.money+parking-amount);s.totalIncome+=parking;s.totalExpenses+=amount;this.dailyIncome+=parking;this.checkProgress();
+      }
+      setWeather(w){if(this.state.weather===w)return;this.state.weather=w;this.rain.visible=w==="rain";this.scene.fog.density=w==="rain"?.006:w==="cloudy"?.0042:.0032;this.toast(tr("Погода изменилась","Weather changed"),w==="rain"?tr("Начался лёгкий дождь","Light rain started"):w==="cloudy"?tr("Стало облачно","Clouds are moving in"):tr("Небо прояснилось","The sky has cleared"))}
+      formatTime(){const h=Math.floor(this.state.time/60)%24,m=Math.floor(this.state.time%60);return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")}
+      ui(){
+        const s=this.state;$("#moneyValue").textContent=money(s.money);$("#passengerValue").textContent=fmt(s.passengers);$("#flightValue").textContent=fmt(s.flights);$("#levelValue").textContent=tr("Уровень ","Level ")+s.level;
+        const need=this.xpNeed(s.level);$("#levelBar").style.width=clamp(s.xp/need*100,0,100)+"%";
+        const names={sunny:[tr("Ясно","Sunny"),"sun"],cloudy:[tr("Облачно","Cloudy"),"cloud"],rain:[tr("Дождь","Rain"),"rain"]},w=names[s.weather];$("#weatherText").textContent=w[0];$("#weatherBadge").innerHTML=icon(w[1]);$("#timeText").textContent=tr("День ","Day ")+s.day+" · "+this.formatTime();
+        this.updateObjective();const avail=Object.entries(BUILDINGS).filter(([id,b])=>b.level<=s.level&&!s.built[id]).length;$("#buildBadge").textContent=avail;$("#buildBadge").classList.toggle("hidden",avail===0);
+      }
+      xpNeed(level){return 115+level*75}
+      checkProgress(){
+        while(this.state.xp>=this.xpNeed(this.state.level)){this.state.xp-=this.xpNeed(this.state.level);this.state.level++;const bonus=10000+this.state.level*5000;this.state.money+=bonus;this.audio.upgrade();this.confetti();this.toast(tr("Новый уровень "+this.state.level+"!","Airport level "+this.state.level+"!"),tr("Открыты новые возможности · +"+money(bonus),"New options unlocked · +"+money(bonus)),"good");this.unlockAchievement("level"+this.state.level)}
+        this.checkObjective();if(this.state.flights>=1)this.unlockAchievement("firstFlight");if(this.state.totalPassengers>=500)this.unlockAchievement("pass500");if(Object.keys(this.state.built).length>=5)this.unlockAchievement("builder");
+      }
+      objectives(){
+        return [
+          {title:["Встречаем первые рейсы","Welcome first flights"],desc:["Обслужите два самолёта, чтобы получить стартовый бонус.","Complete two aircraft turnarounds."],type:"flights",goal:2,reward:10000},
+          {title:["Аэропорт набирает популярность","Airport gets popular"],desc:["Перевезите 120 пассажиров.","Serve 120 passengers."],type:"passengers",goal:120,reward:16000},
+          {title:["Пора расширяться","Time to expand"],desc:["Постройте дополнительный гейт.","Build an extra gate."],type:"building",id:"gate2",goal:1,reward:20000},
+          {title:["Региональный хаб","Regional hub"],desc:["Достигните 3 уровня аэропорта.","Reach airport level 3."],type:"level",goal:3,reward:26000},
+          {title:["Большой поток","Passenger flow"],desc:["Обслужите ещё 8 рейсов.","Complete 8 more flights."],type:"flightsDelta",goal:8,reward:35000},
+          {title:["Международный статус","International status"],desc:["Постройте расширение терминала.","Build the terminal extension."],type:"building",id:"terminal2",goal:1,reward:50000},
+          {title:["Аэропорт мирового класса","World-class airport"],desc:["Достигните 7 уровня. Развитие продолжится без ограничений.","Reach level 7. Free play continues afterwards."],type:"level",goal:7,reward:100000}
+        ];
+      }
+      objectiveProgress(o){
+        if(o.type==="flights")return this.state.flights;if(o.type==="passengers")return this.state.totalPassengers;if(o.type==="building")return this.state.built[o.id]?1:0;if(o.type==="level")return this.state.level;if(o.type==="flightsDelta")return this.state.flights-(this.state.objectiveBase.flights||0);return 0;
+      }
+      updateObjective(){
+        const o=this.objectives()[Math.min(this.state.objective,this.objectives().length-1)],p=Math.min(o.goal,this.objectiveProgress(o));$("#objectiveTitle").textContent=tr(o.title[0],o.title[1]);$("#objectiveDesc").textContent=tr(o.desc[0],o.desc[1]);$("#objectiveBar").style.width=p/o.goal*100+"%";$("#objectiveCount").textContent=fmt(p)+" / "+fmt(o.goal);
+      }
+      checkObjective(){
+        const list=this.objectives();if(this.state.objective>=list.length)return;const o=list[this.state.objective];if(this.objectiveProgress(o)<o.goal)return;
+        this.state.money+=o.reward;this.audio.upgrade();this.confetti();this.toast(tr("Цель выполнена!","Objective complete!"),"+"+money(o.reward),"good");this.state.objective++;this.state.objectiveBase={flights:this.state.flights,passengers:this.state.totalPassengers};
+      }
+      unlockAchievement(id){if(this.state.achievements[id])return;this.state.achievements[id]=true;if(["firstFlight","pass500","builder","level5","level7"].includes(id))this.toast(tr("Новое достижение","Achievement unlocked"),this.achievementName(id),"good")}
+      achievementName(id){const n={firstFlight:["Первый взлёт","First takeoff"],pass500:["Народный аэропорт","People mover"],builder:["Архитектор","Architect"],level5:["Большой хаб","Major hub"],level7:["Мировой класс","World class"]};return tr(...(n[id]||["Новая высота","New height"]))}
+      start(load){
+        this.audio.start();this.closeModal();this.closePanel();$("#menu").classList.add("hidden-menu");$("#gameUI").classList.remove("hidden");this.active=true;
+        if(load){const data=this.readSave();if(data){this.state={...defaultState(),...data,settings:{...defaultState().settings,...data.settings},upgrades:{...defaultState().upgrades,...data.upgrades},built:data.built||{},achievements:data.achievements||{}};this.applyLoadedWorld();const mins=Math.min(120,Math.floor((Date.now()-(data.lastSave||Date.now()))/60000));if(mins>1){const offline=Math.min(75000,mins*(90+this.state.level*25));this.state.money+=offline;this.toast(tr("С возвращением!","Welcome back!"),tr("Доход за время отсутствия: ","Offline income: ")+money(offline),"good")}}}
+        else{const prefs={...this.state.settings},lang=this.state.lang;this.state=defaultState();this.state.settings=prefs;this.state.lang=lang;this.resetWorldExpansions();setTimeout(()=>this.showTutorial(),700)}
+        this.gameSpeed=1;this.spawnTimer=2;this.applyLanguage();this.applyQuality();this.ui();this.updateFlightBoard();this.cameraHome();this.save(false);
+      }
+      resetWorldExpansions(){for(const id in BUILDINGS){const o=this.world.getObjectByName(id);if(o)this.world.remove(o)}}
+      save(manual=true){if(!this.active)return;this.state.lastSave=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(this.state));this.updateContinue();if(manual){this.audio.click();this.toast(tr("Игра сохранена","Game saved"),tr("Прогресс записан на этом устройстве","Progress stored on this device"),"good")}}catch(e){if(manual)this.toast(tr("Не удалось сохранить","Could not save"),tr("Хранилище браузера недоступно","Browser storage is unavailable"),"warn")}}
+      readSave(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))}catch(e){return null}}
+      updateContinue(){const has=!!this.readSave();$("#continueGame").disabled=!has}
+      showTutorial(){if(this.state.tutorialDone)return;this.tutorialIndex=0;$("#tutorial").classList.remove("hidden");this.renderTutorial()}
+      renderTutorial(){
+        const steps=[
+          [["Добро пожаловать, директор!","Welcome, Director!"],["Ваш первый аэропорт уже работает. Самолёты сами заходят на посадку, а вы развиваете инфраструктуру.","Your first airport is operational. Aircraft arrive automatically while you develop it."]],
+          [["Следите за рейсами","Watch the flights"],["Каждый самолёт садится, рулит к гейту, высаживает и принимает пассажиров, а затем снова взлетает.","Every aircraft lands, taxis, unloads, boards passengers and takes off again."]],
+          [["Стройте одним касанием","Build with one tap"],["Откройте «Строить», выберите объект и коснитесь подсвеченной площадки. Новые объекты сразу появляются в аэропорту.","Open Build, choose an object and tap the highlighted site."]],
+          [["Растите без стресса","Grow without stress"],["В игре нет поражения. Выполняйте цели, улучшайте обслуживание и превратите аэродром в международный хаб.","There is no game over. Complete goals and grow into an international hub."]]
+        ],s=steps[this.tutorialIndex];$("#tutorialStep").textContent=tr("Шаг ","Step ")+(this.tutorialIndex+1)+" "+tr("из","of")+" 4";$("#tutorialTitle").textContent=tr(s[0][0],s[0][1]);$("#tutorialText").textContent=tr(s[1][0],s[1][1]);$("#nextTutorial").textContent=this.tutorialIndex===3?tr("Начать игру","Start playing"):tr("Далее","Next");$("#skipTutorial").textContent=tr("Пропустить","Skip");$("#tutorialDots").innerHTML=steps.map((_,i)=>'<i class="'+(i===this.tutorialIndex?"on":"")+'"></i>').join("");
+      }
+      finishTutorial(){this.state.tutorialDone=true;$("#tutorial").classList.add("hidden");this.save(false);this.toast(tr("Первый самолёт уже близко","The first aircraft is close"),tr("Осмотритесь вокруг и следите за табло","Look around and watch the flight board"),"good")}
+      openPanel(type){
+        this.audio.click();this.currentPanel=type;$("#panel").classList.add("show");$("#scrim").classList.add("show");$$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.panel===type));
+        const meta={build:["build",tr("Строительство","Build"),tr("Расширяйте аэропорт","Expand your airport")],upgrade:["up",tr("Улучшения","Upgrades"),tr("Ускоряйте и зарабатывайте больше","Move faster and earn more")],stats:["chart",tr("Статистика","Statistics"),tr("Результаты вашего аэропорта","Your airport performance")]};
+        if(type==="settings"){this.closePanel();this.openSettings();return}
+        const m=meta[type];$("#panelIcon").innerHTML=icon(m[0]);$("#panelTitle").textContent=m[1];$("#panelSub").textContent=m[2];if(type==="build")this.renderBuild();if(type==="upgrade")this.renderUpgrades();if(type==="stats")this.renderStats();
+      }
+      closePanel(){$("#panel").classList.remove("show");$("#scrim").classList.remove("show");$$(".nav-btn").forEach(b=>b.classList.remove("active"))}
+      renderBuild(){
+        $("#panelBody").innerHTML='<div class="panel-tabs"><button class="active">'+tr("Объекты","Facilities")+'</button><button id="focusAirport">'+tr("Показать аэропорт","View airport")+'</button></div><div class="card-grid">'+Object.entries(BUILDINGS).map(([id,b])=>{
+          const built=!!this.state.built[id],locked=this.state.level<b.level,price=money(b.cost);return '<article class="shop-card '+(built?"built ":locked?"locked ":"")+'"><span class="shop-icon">'+icon(b.icon)+'</span>'+(built?'<i class="built-mark">'+icon("check")+"</i>":"")+'<h3>'+tr(b.name[0],b.name[1])+'</h3><p>'+tr(b.desc[0],b.desc[1])+'</p><div class="shop-action"><span class="price '+(locked?"lock":"")+'">'+(built?tr("Построено","Built"):locked?tr("Уровень ","Level ")+b.level:price)+'</span><button class="mini-buy" data-build="'+id+'" '+(built||locked?"disabled":"")+'>'+ (built?tr("Готово","Done"):tr("Выбрать","Select"))+'</button></div></article>'
+        }).join("")+'</div>';
+        $$("[data-build]").forEach(b=>b.onclick=()=>this.beginPlacement(b.dataset.build));$("#focusAirport").onclick=()=>{this.cameraHome();this.closePanel()};
+      }
+      beginPlacement(id){
+        const b=BUILDINGS[id];if(this.state.money<b.cost){this.toast(tr("Недостаточно средств","Not enough funds"),tr("Нужно ещё ","You need ")+money(b.cost-this.state.money),"warn");this.audio.tone(170,.2,"square",.05);return}
+        this.buildMode=id;this.closePanel();$("#placementTitle").textContent=tr("Разместите: ","Place: ")+tr(b.name[0],b.name[1]);$("#placementHint").classList.add("show");
+        this.ghost=this.makeGhost(b);this.scene.add(this.ghost);this.ghost.position.set(b.pos[0],.3,b.pos[1]);this.controls.enabled=true;this.cameraTarget(new THREE.Vector3(b.pos[0],0,b.pos[1]),75);
+      }
+      makeGhost(b){const g=new THREE.Group(),m=new THREE.MeshStandardMaterial({color:0x4ff0a7,transparent:true,opacity:.4,depthWrite:false,emissive:0x23a96f,emissiveIntensity:.5});const box=this.mesh(new THREE.BoxGeometry(b.type==="runway"?185:b.type==="terminal"?42:b.type==="gate"?10:18,b.type==="tower"?20:3,b.type==="runway"?15:b.type==="terminal"?17:12),m,g,false);box.position.y=(b.type==="tower"?10:1.5);const ring=this.mesh(new THREE.RingGeometry(7,8,32),m,g,false);ring.rotation.x=-Math.PI/2;ring.position.y=.1;return g}
+      cancelPlacement(){this.buildMode=null;$("#placementHint").classList.remove("show");if(this.ghost){this.scene.remove(this.ghost);this.ghost=null}}
+      confirmPlacement(){
+        const id=this.buildMode,b=BUILDINGS[id];if(!id||!b)return;if(this.state.money<b.cost){this.cancelPlacement();return}
+        this.state.money-=b.cost;this.state.totalExpenses+=b.cost;this.state.built[id]=true;this.state.xp+=50;this.addExpansion(id);this.cancelPlacement();this.particles.burst(new THREE.Vector3(b.pos[0],3,b.pos[1]),35,"spark");this.confetti();this.audio.upgrade();this.toast(tr("Построено!","Built!"),tr(b.name[0],b.name[1])+" · -"+money(b.cost),"good");this.checkProgress();this.checkObjective();this.ui();this.save(false);this.cameraHome();
+      }
+      renderUpgrades(){
+        $("#panelBody").innerHTML='<div class="card-grid">'+Object.entries(UPGRADES).map(([id,u])=>{const lv=this.state.upgrades[id],max=lv>=u.max,cost=Math.round(u.base*Math.pow(1.62,lv));return '<article class="shop-card '+(max?"built":"")+'"><span class="shop-icon">'+icon(u.icon)+'</span><h3>'+tr(u.name[0],u.name[1])+'</h3><p>'+tr(u.desc[0],u.desc[1])+'</p><div class="level-dots">'+Array.from({length:u.max},(_,i)=>'<i class="'+(i<lv?"on":"")+'"></i>').join("")+'</div><div class="shop-action"><span class="price">'+(max?tr("Максимум","Maximum"):money(cost))+'</span><button class="mini-buy" data-upgrade="'+id+'" '+(max?"disabled":"")+'>'+tr("Улучшить","Upgrade")+'</button></div></article>'}).join("")+"</div>";
+        $$("[data-upgrade]").forEach(b=>b.onclick=()=>this.buyUpgrade(b.dataset.upgrade));
+      }
+      buyUpgrade(id){
+        const u=UPGRADES[id],lv=this.state.upgrades[id],cost=Math.round(u.base*Math.pow(1.62,lv));if(lv>=u.max)return;if(this.state.money<cost){this.toast(tr("Недостаточно средств","Not enough funds"),tr("Нужно ещё ","You need ")+money(cost-this.state.money),"warn");return}
+        this.state.money-=cost;this.state.totalExpenses+=cost;this.state.upgrades[id]++;this.state.xp+=30;this.audio.upgrade();this.confetti();this.toast(tr("Улучшение установлено","Upgrade installed"),tr(u.name[0],u.name[1])+" · "+tr("уровень ","level ")+(lv+1),"good");this.checkProgress();this.ui();this.renderUpgrades();this.save(false);
+      }
+      renderStats(){
+        const s=this.state,profit=s.totalIncome-s.totalExpenses,avg=s.flights?Math.round(s.totalPassengers/s.flights):0,play=Math.floor(s.playSeconds/60),ach=["firstFlight","pass500","builder","level5","level7"];
+        $("#panelBody").innerHTML='<div class="stat-hero"><div class="stat-hero-head"><div><h3>'+tr("Общий доход","Total revenue")+'</h3><strong>'+money(s.totalIncome)+'</strong></div><span class="trend">'+(profit>=0?"+":"")+money(profit)+'</span></div>'+this.sparkline()+'</div><div class="metric-grid"><div class="metric"><small>'+tr("Всего пассажиров","Total passengers")+'</small><strong>'+fmt(s.totalPassengers)+'</strong></div><div class="metric"><small>'+tr("Среднее на рейс","Average per flight")+'</small><strong>'+avg+'</strong></div><div class="metric"><small>'+tr("Счастье","Happiness")+'</small><strong>'+Math.round(s.happiness+s.upgrades.happiness*2+(s.built.garden?4:0))+'%</strong></div><div class="metric"><small>'+tr("Время управления","Play time")+'</small><strong>'+play+' '+tr("мин","min")+'</strong></div></div><div class="section-label">'+tr("Достижения","Achievements")+'</div>'+ach.map(id=>'<div class="achievement '+(s.achievements[id]?"":"locked")+'"><span class="achievement-icon">'+icon(s.achievements[id]?"trophy":"lock")+'</span><span><strong>'+this.achievementName(id)+'</strong><small>'+this.achievementDesc(id)+'</small></span></div>').join("");
+      }
+      sparkline(){
+        const a=this.state.history.length?this.state.history:[0],max=Math.max(1,...a),pts=a.map((v,i)=>(i/(a.length-1||1)*320)+","+(64-v/max*54)).join(" ");
+        return '<svg id="sparkline" viewBox="0 0 320 70" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a94fa" stop-opacity=".3"/><stop offset="1" stop-color="#4a94fa" stop-opacity="0"/></linearGradient></defs><path d="M0,70 L'+pts.replace(/ /g," L")+' L320,70 Z" fill="url(#sg)"/><polyline points="'+pts+'" fill="none" stroke="#3478f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      }
+      achievementDesc(id){const d={firstFlight:["Обслужить первый рейс","Complete the first flight"],pass500:["Перевезти 500 пассажиров","Serve 500 passengers"],builder:["Построить 5 объектов","Build 5 facilities"],level5:["Достичь 5 уровня","Reach level 5"],level7:["Достичь 7 уровня","Reach level 7"]};return tr(...(d[id]||["Продолжайте развиваться","Keep growing"]))}
+      openSettings(){
+        this.audio.click();const s=this.state.settings;$("#modal").innerHTML='<div class="modal-top"><h2>'+tr("Настройки","Settings")+'</h2><button class="modal-close">'+icon("x")+'</button></div><div class="settings-list">'+
+          this.settingRow("volume",tr("Музыка","Music"),tr("Фоновая атмосфера аэропорта","Airport background ambience"),'<input id="musicRange" type="range" min="0" max="100" value="'+s.music+'">')+
+          this.settingRow("volume",tr("Эффекты","Sound effects"),tr("Самолёты, касса и интерфейс","Aircraft, cash and interface"),'<input id="sfxRange" type="range" min="0" max="100" value="'+s.sfx+'">')+
+          this.settingRow("settings",tr("Графика","Graphics"),tr("Качество теней и свечения","Shadow and glow quality"),'<select id="qualitySelect"><option value="low" '+(s.quality==="low"?"selected":"")+'>'+tr("Низкая","Low")+'</option><option value="medium" '+(s.quality==="medium"?"selected":"")+'>'+tr("Средняя","Medium")+'</option><option value="high" '+(s.quality==="high"?"selected":"")+'>'+tr("Высокая","High")+'</option></select>')+
+          this.settingRow("info",tr("Язык","Language"),tr("Язык игрового интерфейса","Game interface language"),'<select id="langSelect"><option value="ru" '+(this.state.lang==="ru"?"selected":"")+'>Русский</option><option value="en" '+(this.state.lang==="en"?"selected":"")+'>English</option></select>')+
+          this.settingRow("full",tr("Полный экран","Fullscreen"),tr("Скрыть интерфейс браузера, если доступно","Hide browser UI where supported"),'<button id="settingsFull" class="mini-buy">'+tr("Открыть","Open")+'</button>')+
+          '</div><button id="resetSave" class="danger">'+icon("x")+tr("Сбросить весь прогресс","Reset all progress")+'</button>';this.showModal();$(".modal-close").onclick=()=>this.closeModal();
+        $("#musicRange").oninput=e=>{s.music=+e.target.value;this.audio.update();this.savePrefs()};$("#sfxRange").oninput=e=>{s.sfx=+e.target.value;this.savePrefs()};$("#qualitySelect").onchange=e=>{s.quality=e.target.value;this.applyQuality();this.savePrefs()};$("#langSelect").onchange=e=>{this.state.lang=e.target.value;this.applyLanguage();this.closeModal();this.ui();this.updateFlightBoard();this.toast(tr("Язык изменён","Language changed"),tr("Интерфейс обновлён","Interface updated"),"good");this.savePrefs();this.save(false)};$("#settingsFull").onclick=()=>this.fullscreen();$("#resetSave").onclick=()=>this.confirmReset();
+      }
+      settingRow(ic,title,sub,control){return '<div class="setting-row"><span class="icon-wrap">'+icon(ic)+'</span><span class="setting-text"><strong>'+title+'</strong><small>'+sub+'</small></span>'+control+"</div>"}
+      openAbout(){
+        $("#modal").innerHTML='<div class="modal-top"><h2>'+tr("Об игре","About")+'</h2><button class="modal-close">'+icon("x")+'</button></div><div class="about-logo">'+icon("plane")+'</div><div class="about-copy"><h3>Airport Tycoon</h3><span class="version">2026 · Complete Edition</span><p>'+tr("Спокойный трёхмерный симулятор развития аэропорта. Каждый самолёт проходит полный цикл — от захода на посадку до следующего взлёта. Игра автоматически сохраняется в браузере и не требует регистрации.","A relaxing 3D airport management game. Every aircraft follows a full cycle from approach to its next takeoff. The game saves automatically in your browser and requires no account.")+'</p></div>';this.showModal();$(".modal-close").onclick=()=>this.closeModal();
+      }
+      confirmReset(){
+        $("#modal").innerHTML='<div class="modal-top"><h2>'+tr("Сбросить прогресс?","Reset progress?")+'</h2></div><p style="font-size:12px;color:var(--muted);line-height:1.6">'+tr("Все деньги, постройки, улучшения и статистика будут удалены. Это действие нельзя отменить.","All money, buildings, upgrades and statistics will be deleted. This cannot be undone.")+'</p><div class="tutorial-actions"><button id="cancelReset" class="ghost-btn">'+tr("Отмена","Cancel")+'</button><button id="doReset" class="danger" style="margin:0">'+tr("Удалить","Delete")+'</button></div>';$("#cancelReset").onclick=()=>this.closeModal();$("#doReset").onclick=()=>{localStorage.removeItem(SAVE_KEY);location.reload()};
+      }
+      confirmNew(){
+        if(!this.readSave()){this.start(false);return}
+        $("#modal").innerHTML='<div class="modal-top"><h2>'+tr("Начать заново?","Start a new game?")+'</h2><button class="modal-close">'+icon("x")+'</button></div><p style="font-size:12px;color:var(--muted);line-height:1.6">'+tr("Текущее сохранение будет заменено новой игрой.","Your current save will be replaced with a new game.")+'</p><div class="tutorial-actions"><button id="keepSave" class="ghost-btn">'+tr("Отмена","Cancel")+'</button><button id="startFresh" class="primary">'+tr("Новая игра","New game")+'</button></div>';this.showModal();$(".modal-close").onclick=$("#keepSave").onclick=()=>this.closeModal();$("#startFresh").onclick=()=>this.start(false);
+      }
+      showModal(){$("#modalWrap").classList.add("show")}
+      closeModal(){$("#modalWrap").classList.remove("show")}
+      applyLanguage(){
+        const en=this.state.lang==="en",set=(sel,ru,eng)=>{const el=$(sel);if(el)el.textContent=en?eng:ru};
+        [
+          [".eyebrow","Создай аэропорт мечты","Build your dream airport"],
+          [".menu-description","Преврати маленький региональный аэродром в живой международный хаб. Принимай рейсы, развивай терминалы и наблюдай, как твой аэропорт растёт.","Turn a small regional airfield into a living international hub. Welcome flights, expand terminals and watch your airport grow."],
+          ["#newGame span","Новая игра","New game"],["#continueGame span","Продолжить","Continue"],["#menuSettings span","Настройки","Settings"],["#menuAbout span","Об игре","About"],
+          ["#moneyValue + small","Бюджет","Budget"],["#passengerValue + small","Пассажиры","Passengers"],["#flightValue + small","Рейсы","Flights"],
+          [".objective-head span","Текущая цель","Current objective"],[".flight-board-title strong","Табло рейсов","Flight board"],
+          ['[data-panel="build"] span',"Строить","Build"],['[data-panel="upgrade"] span',"Улучшения","Upgrades"],['[data-panel="stats"] span',"Статистика","Statistics"],['[data-panel="settings"] span',"Настройки","Settings"],
+          [".menu-footer span:nth-child(1)","Один файл · Автосохранение","One file · Autosave"],[".menu-footer span:nth-child(2)","Мышь / сенсор","Mouse / touch"],
+          ["#placementHint small","Коснитесь подсвеченной зоны для установки","Tap the highlighted site to place"],["#cancelPlacement","Отмена","Cancel"]
+        ].forEach(x=>set(...x));
+        const attrs=[["#cameraHome","Общий вид","Overview"],["#manualSave","Сохранить игру","Save game"],["#fullScreen","На весь экран","Fullscreen"],["#hideObjective","Скрыть цель","Hide objective"],["#closePanel","Закрыть панель","Close panel"]];
+        attrs.forEach(x=>{const el=$(x[0]);if(el){el.setAttribute("aria-label",en?x[2]:x[1]);el.dataset.tooltip=en?x[2]:x[1]}});
+        $(".speed-control")?.setAttribute("aria-label",en?"Game speed":"Скорость игры");
+      }
+      savePrefs(){try{localStorage.setItem(PREF_KEY,JSON.stringify({...this.state.settings,lang:this.state.lang}))}catch(e){}}
+      loadPrefs(){try{const p=JSON.parse(localStorage.getItem(PREF_KEY));if(p){const {lang,...settings}=p;this.state.settings={...this.state.settings,...settings};if(lang)this.state.lang=lang}}catch(e){}}
+      applyQuality(){
+        const q=this.state.settings.quality,ratio=q==="low"?1:q==="medium"?Math.min(devicePixelRatio,1.35):Math.min(devicePixelRatio,1.8);this.renderer.setPixelRatio(ratio);this.renderer.shadowMap.enabled=q!=="low";this.bloom.enabled=q==="high";this.resize();
+      }
+      showModalMessage(title,text){$("#modal").innerHTML='<div class="modal-top"><h2>'+title+'</h2><button class="modal-close">'+icon("x")+'</button></div><p style="font-size:12px;color:var(--muted);line-height:1.6">'+text+"</p>";this.showModal();$(".modal-close").onclick=()=>this.closeModal()}
+      fullscreen(){
+        const el=document.documentElement;if(!document.fullscreenElement){const p=el.requestFullscreen?.()||el.webkitRequestFullscreen?.();if(p?.catch)p.catch(()=>this.toast(tr("Полный экран недоступен","Fullscreen unavailable"),tr("Добавьте страницу на главный экран","Add the page to your home screen"),"warn"))}else(document.exitFullscreen||document.webkitExitFullscreen)?.call(document);this.audio.click();
+      }
+      cameraHome(){this.cameraTarget(new THREE.Vector3(0,0,-5),125)}
+      cameraTarget(target,distance=90){
+        const startPos=this.camera.position.clone(),startTar=this.controls.target.clone(),dir=new THREE.Vector3(1,.85,1.2).normalize(),end=target.clone().addScaledVector(dir,distance);let t=0;
+        const move=()=>{t+=.035;const e=ease(clamp(t,0,1));this.camera.position.lerpVectors(startPos,end,e);this.controls.target.lerpVectors(startTar,target,e);if(t<1)requestAnimationFrame(move)};move();
+      }
+      onScenePointer(e,click){
+        const r=this.renderer.domElement.getBoundingClientRect();this.pointer.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);this.ray.setFromCamera(this.pointer,this.camera);
+        if(this.buildMode){
+          const hits=this.ray.intersectObject(this.world.getObjectByName("ground")||this.world.children[0]);if(hits.length&&this.ghost){const b=BUILDINGS[this.buildMode],p=hits[0].point;this.ghost.position.set(lerp(p.x,b.pos[0],.85),.3,lerp(p.z,b.pos[1],.85))}
+          if(click)this.confirmPlacement();return;
+        }
+        if(click){const hits=this.ray.intersectObjects(this.flights.map(f=>f.mesh),true);if(hits.length){let o=hits[0].object;while(o&&!o.userData.flight)o=o.parent;const f=o?.userData.flight;if(f){this.toast(f.number,tr(f.type.name[0],f.type.name[1])+" · "+(this.state.lang==="en"?PHASE_EN[f.phase]:PHASE_RU[f.phase]));this.cameraTarget(f.mesh.position.clone(),45)}}}
+      }
+      floatMoney(amount){
+        const d=document.createElement("div");d.className="money-float";d.textContent="+"+money(amount);d.style.left=(innerWidth*.5+(Math.random()-.5)*120)+"px";d.style.top=(innerHeight*.45)+"px";document.body.appendChild(d);setTimeout(()=>d.remove(),1500)
+      }
+      toast(title,detail="",kind=""){
+        const d=document.createElement("div");d.className="toast "+kind;d.innerHTML='<i class="toast-dot"></i><div><strong>'+title+'</strong>'+detail+"</div>";$("#toastZone").appendChild(d);setTimeout(()=>{d.style.animation="toastOut .3s both";setTimeout(()=>d.remove(),300)},3200)
+      }
+      confetti(){this.particles.burst(this.controls.target.clone().add(new THREE.Vector3(0,10,0)),42,"spark")}
+      resize(){const w=innerWidth,h=innerHeight;this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.renderer.setSize(w,h);this.composer.setSize(w,h)}
+      bindUI(){
+        this.loadPrefs();this.updateContinue();$("#newGame").onclick=()=>{this.audio.start();this.confirmNew()};$("#continueGame").onclick=()=>{this.audio.start();this.start(true)};$("#menuSettings").onclick=()=>{this.audio.start();this.openSettings()};$("#menuAbout").onclick=()=>this.openAbout();
+        $$("[data-panel]").forEach(b=>b.onclick=()=>this.openPanel(b.dataset.panel));$("#closePanel").onclick=$("#scrim").onclick=()=>this.closePanel();$("#manualSave").onclick=()=>this.save(true);$("#fullScreen").onclick=()=>this.fullscreen();$("#cameraHome").onclick=()=>this.cameraHome();$("#cancelPlacement").onclick=()=>this.cancelPlacement();
+        $$("[data-speed]").forEach(b=>b.onclick=()=>{this.gameSpeed=+b.dataset.speed;$$("[data-speed]").forEach(x=>x.classList.toggle("active",x===b));this.audio.click()});
+        $("#hideObjective").onclick=()=>{$("#objectiveCard").style.transform="translateX(-120%)";setTimeout(()=>$("#objectiveCard").style.display="none",300)};
+        $("#nextTutorial").onclick=()=>{this.audio.click();if(this.tutorialIndex<3){this.tutorialIndex++;this.renderTutorial()}else this.finishTutorial()};$("#skipTutorial").onclick=()=>this.finishTutorial();
+        $("#modalWrap").addEventListener("pointerdown",e=>{if(e.target===$("#modalWrap"))this.closeModal()});
+        document.addEventListener("keydown",e=>{if(e.key==="Escape"){this.cancelPlacement();this.closePanel();this.closeModal()}if(e.key.toLowerCase()==="s"&&(e.ctrlKey||e.metaKey)){e.preventDefault();this.save(true)}});
+      }
+      animate(){
+        requestAnimationFrame(()=>this.animate());const dt=Math.min(.05,this.clock.getDelta());this.update(dt);
+        if(this.state.settings.quality==="high"&&this.bloom.enabled)this.composer.render();else this.renderer.render(this.scene,this.camera);
+      }
+    }
 
-function initThree(){
-  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x9ccff0,.007);
-  camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,500);camera.position.set(55,46,62);
-  renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;$('#world').appendChild(renderer.domElement);
-  composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.45,.8,.75);composer.addPass(bloom);
-  controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.06;controls.target.set(0,0,0);controls.minDistance=24;controls.maxDistance=120;controls.maxPolarAngle=Math.PI*.47;controls.minPolarAngle=.35;controls.screenSpacePanning=false;controls.touches.ONE=THREE.TOUCH.ROTATE;controls.touches.TWO=THREE.TOUCH.DOLLY_PAN;
-  raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();clock=new THREE.Clock();
-  buildWorld();applyGraphics();window.addEventListener('resize',onResize);renderer.domElement.addEventListener('pointerup',onWorldTap);
-}
-
-function mat(color,rough=.65,metal=.05,emissive=0x000000,ei=0){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive,emissiveIntensity:ei})}
-function box(w,h,d,m,x=0,y=h/2,z=0){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;return mesh}
-function cyl(r,h,m,x=0,y=h/2,z=0,seg=20){const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg),m);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;return mesh}
-function group(...objs){const g=new THREE.Group();objs.forEach(o=>g.add(o));return g}
-
-function buildWorld(){
-  worldRoot=new THREE.Group();airportRoot=new THREE.Group();lightsRoot=new THREE.Group();weatherRoot=new THREE.Group();fxRoot=new THREE.Group();passengerRoot=new THREE.Group();aircraftRoot=new THREE.Group();constructionRoot=new THREE.Group();
-  scene.add(worldRoot,airportRoot,lightsRoot,weatherRoot,fxRoot,passengerRoot,aircraftRoot,constructionRoot);
-  hemi=new THREE.HemisphereLight(0xc9ebff,0x4d6b45,1.8);scene.add(hemi);
-  sun=new THREE.DirectionalLight(0xfff2d1,4.2);sun.position.set(50,70,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-100;sun.shadow.camera.right=100;sun.shadow.camera.top=100;sun.shadow.camera.bottom=-100;sun.shadow.camera.near=1;sun.shadow.camera.far=180;scene.add(sun);
-  const skyGeo=new THREE.SphereGeometry(260,32,16);const skyMat=new THREE.MeshBasicMaterial({color:0x86c9f4,side:THREE.BackSide});sky=new THREE.Mesh(skyGeo,skyMat);scene.add(sky);
-  ground=new THREE.Mesh(new THREE.PlaneGeometry(260,260),new THREE.MeshStandardMaterial({color:0x5c9d58,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;worldRoot.add(ground);
-  createLandscape();createBaseAirport();createWeather();
-}
-
-function createLandscape(){
-  const treeGeo=new THREE.ConeGeometry(.9,3.2,7);const treeMat=mat(0x2e713d,1);const trunksGeo=new THREE.CylinderGeometry(.18,.24,1.2,6);const trunkMat=mat(0x765238,1);
-  const treeCount=150;const leaves=new THREE.InstancedMesh(treeGeo,treeMat,treeCount);const trunks=new THREE.InstancedMesh(trunksGeo,trunkMat,treeCount);leaves.castShadow=trunks.castShadow=true;const dummy=new THREE.Object3D();
-  for(let i=0;i<treeCount;i++){let x,z;do{x=(Math.random()-.5)*180;z=(Math.random()-.5)*180}while(Math.abs(x)<48&&Math.abs(z)<48);const s=.7+Math.random()*.75;dummy.position.set(x,2.1*s,z);dummy.scale.setScalar(s);dummy.rotation.y=Math.random()*Math.PI;dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);dummy.position.set(x,.6*s,z);dummy.scale.setScalar(s);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix)}
-  worldRoot.add(leaves,trunks);
-  const cityMat=mat(0xb8c1c8,.9);for(let i=0;i<36;i++){const a=Math.random()*Math.PI*2,r=72+Math.random()*28,x=Math.cos(a)*r,z=Math.sin(a)*r;const h=3+Math.random()*13;const b=box(3+Math.random()*5,h,3+Math.random()*5,cityMat,x,h/2,z);b.castShadow=false;worldRoot.add(b)}
-}
-
-function createBaseAirport(){
-  const asphalt=mat(0x2e3338,.95);const concrete=mat(0xbfc4c4,.92);const white=mat(0xf7f5e8,.8);const yellow=mat(0xffd84a,.75);const glass=mat(0x6cc6dd,.25,.18,0x24708f,.18);
-  const apron=new THREE.Mesh(new THREE.PlaneGeometry(58,38),concrete);apron.rotation.x=-Math.PI/2;apron.position.set(2,.015,2);apron.receiveShadow=true;airportRoot.add(apron);
-  runway1=createRunway(new THREE.Vector3(0,.03,-18),76,8,asphalt,white,yellow);airportRoot.add(runway1);
-  const taxi=new THREE.Mesh(new THREE.PlaneGeometry(60,4.4),asphalt);taxi.rotation.x=-Math.PI/2;taxi.position.set(0,.035,-10);taxi.receiveShadow=true;airportRoot.add(taxi);taxiways.push(taxi);
-  for(let x=-28;x<=28;x+=4){const mark=box(1.6,.025,.18,yellow,x,.052,-10);mark.castShadow=false;airportRoot.add(mark)}
-  const terminal=createTerminal(false,glass);terminal.position.set(-13,0,7);airportRoot.add(terminal);terminal.userData.id='terminal1';
-  createGate(0,-2,1);createParking(false);createRoad(false);createLights();createGroundVehicles();
-}
-
-function createRunway(pos,len,w,asphalt=mat(0x2f3338,.95),white=mat(0xffffff,.7),yellow=mat(0xffd54b,.7)){
-  const g=new THREE.Group();g.position.copy(pos);const slab=new THREE.Mesh(new THREE.PlaneGeometry(len,w),asphalt);slab.rotation.x=-Math.PI/2;slab.receiveShadow=true;g.add(slab);
-  for(let x=-len/2+5;x<len/2-4;x+=6){const center=box(3,.03,.22,white,x,.025,0);center.castShadow=false;g.add(center)}
-  for(const z of [-w/2+.35,w/2-.35]){for(let x=-len/2+1;x<len/2;x+=2.5){const light=cyl(.08,.08,mat(0xffffff,.2,.1,0x89d9ff,2.4),x,.08,z,10);light.castShadow=false;g.add(light);lightsRoot.add(light.clone())}}
-  for(const end of [-1,1]){for(let i=-3;i<=3;i++){const stripe=box(2.6,.035,.32,white,end*(len/2-3),.03,i*.72);stripe.castShadow=false;g.add(stripe)}}
-  return g;
-}
-
-function createTerminal(large=false,glassMat=mat(0x67b9cd,.25,.18,0x24708f,.15)){
-  const g=new THREE.Group();const base=mat(large?0xf3f4f6:0xe7eaec,.75);const roof=mat(0x313b46,.55,.15);
-  const w=large?24:18,d=large?12:10,h=large?6:5;g.add(box(w,h,d,base,0,h/2,0));
-  const win=box(w*.82,h*.5,.14,glassMat,0,h*.58,d/2+.08);g.add(win);g.add(box(w+.7,.45,d+.7,roof,0,h+.22,0));
-  const sign=box(5,.7,.18,mat(0x1f2e3f,.55,.1,0x52c9ff,.8),0,h-.45,d/2+.22);g.add(sign);
-  for(let x=-w/2+2;x<w/2;x+=4){g.add(box(.18,h*.48,.25,mat(0xd7dde2,.5,.1),x,h*.58,d/2+.25))}
-  return g;
-}
-function createGate(x,z,index){
-  const g=new THREE.Group();const jet=box(4,.7,1.1,mat(0xdde2e6,.65),x-2,2.2,z+3.1);jet.rotation.y=.05;g.add(jet);const support=cyl(.22,2.4,mat(0x737f89,.7),x-3.5,1.2,z+3.1);g.add(support);const pad=new THREE.Mesh(new THREE.CircleGeometry(3.5,40),mat(0xc8cbca,.95));pad.rotation.x=-Math.PI/2;pad.position.set(x,.025,z);pad.receiveShadow=true;g.add(pad);const line=box(.18,.025,5.5,mat(0xffd447,.8),x,.05,z);line.castShadow=false;g.add(line);g.userData.gateIndex=index;airportRoot.add(g);gates.push({index,position:new THREE.Vector3(x,0,z),occupied:false,group:g});gateObjects.push(g);return g}
-function createParking(expanded){
-  const g=new THREE.Group();const asphalt=mat(0x3a4045,.95),white=mat(0xffffff,.8);const w=expanded?24:14,d=11;const slab=new THREE.Mesh(new THREE.PlaneGeometry(w,d),asphalt);slab.rotation.x=-Math.PI/2;slab.position.y=.02;slab.receiveShadow=true;g.add(slab);
-  for(let x=-w/2+2;x<w/2;x+=3){g.add(box(.1,.025,d-1,white,x,.05,0))}
-  const colors=[0xff665c,0x4da3ff,0xf2c94c,0xf4f4f4,0x222831,0x64d28b];for(let i=0;i<(expanded?12:6);i++){const car=createCar(colors[i%colors.length]);car.scale.setScalar(.65);car.position.set(-w/2+1.6+(i%6)*3,0.35,-3+(Math.floor(i/6))*3.5);g.add(car)}
-  g.position.set(-23,0,15);g.userData.id='parking';airportRoot.add(g);return g
-}
-function createRoad(upgraded){
-  const roadMat=mat(0x34393e,.95);const g=new THREE.Group();const main=new THREE.Mesh(new THREE.PlaneGeometry(upgraded?70:58,6),roadMat);main.rotation.x=-Math.PI/2;main.position.set(-2,.025,25);main.receiveShadow=true;g.add(main);for(let x=-32;x<32;x+=5){g.add(box(2,.03,.16,mat(0xf7e28b,.8),x,.05,25))}
-  if(upgraded){const island=new THREE.Mesh(new THREE.PlaneGeometry(66,1.2),mat(0x5b9b55,1));island.rotation.x=-Math.PI/2;island.position.set(-2,.055,25);g.add(island);for(let x=-30;x<30;x+=6){const t=group(cyl(.12,1,mat(0x6e4e35,1),x,.5,25),new THREE.Mesh(new THREE.SphereGeometry(.65,10,7),mat(0x2d8242,1)));t.children[1].position.set(x,1.3,25);g.add(t)}}
-  g.userData.id='road';airportRoot.add(g);return g
-}
-function createLights(){
-  const poleMat=mat(0x66727b,.6,.3);for(const p of [[-20,11],[-8,11],[6,11],[18,11],[-20,-7],[18,-7]]){const g=new THREE.Group();g.add(cyl(.1,5,poleMat,p[0],2.5,p[1],8));const bulb=cyl(.22,.2,mat(0xffffff,.2,.1,0xffe6a8,2.5),p[0],5.05,p[1],12);g.add(bulb);lightsRoot.add(g)}}
-function createGroundVehicles(){
-  for(let i=0;i<5;i++){const v=createCar([0xffffff,0xffd54a,0x5fc9ff][i%3]);v.scale.setScalar(.7);v.position.set(-20+i*7,.3,22+(i%2)*4);airportRoot.add(v);vehicles.push({mesh:v,t:Math.random(),speed:.015+Math.random()*.015,dir:i%2?1:-1})}
-  for(let i=0;i<2;i++){const cart=createLuggageCart();cart.position.set(-8+i*8,.2,3);airportRoot.add(cart);vehicles.push({mesh:cart,t:Math.random(),speed:.012,dir:1,cart:true})}
-}
-function createCar(color=0xffffff){const g=new THREE.Group();g.add(box(2,.65,1.05,mat(color,.45,.35),0,.45,0));g.add(box(1.1,.5,.9,mat(0x9fd8ed,.2,.2),-.1,.95,0));for(const x of [-.65,.65])for(const z of [-.55,.55]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.18,12),mat(0x111111,1));w.rotation.x=Math.PI/2;w.position.set(x,.25,z);g.add(w)}return g}
-function createLuggageCart(){const g=new THREE.Group();g.add(box(1.2,.5,.8,mat(0xffd34d,.7),0,.4,0));g.add(box(1.7,.08,.08,mat(0x555d64,.6,.25),.8,.5,0));for(let i=0;i<3;i++)g.add(box(.6,.45,.55,mat([0x5aa9ff,0xff7b7b,0x62d89a][i],.8),-.2+i*.45,.9,0));return g}
-
-function createWeather(){
-  const cloudMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,transparent:true,opacity:.82});
-  for(let i=0;i<10;i++){const g=new THREE.Group();g.visible=false;for(let j=0;j<5;j++){const s=new THREE.Mesh(new THREE.SphereGeometry(3+Math.random()*2,12,8),cloudMat);s.position.set(j*3-6,Math.random()*1.7,Math.random()*2);g.add(s)}g.position.set((Math.random()-.5)*120,30+Math.random()*10,(Math.random()-.5)*90);weatherRoot.add(g);clouds.push(g)}
-  const rainCount=700;const pos=new Float32Array(rainCount*3);for(let i=0;i<rainCount;i++){pos[i*3]=(Math.random()-.5)*120;pos[i*3+1]=Math.random()*55;pos[i*3+2]=(Math.random()-.5)*120}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));rainDrops=new THREE.Points(geo,new THREE.PointsMaterial({color:0x9ed8ff,size:.11,transparent:true,opacity:.65}));rainDrops.visible=false;weatherRoot.add(rainDrops);
-}
-
-function applyBuiltState(){
-  BUILDINGS.forEach(b=>{if(state.built[b.id])constructBuilding(b.id,true)});
-}
-function constructBuilding(id,instant=false){
-  if(airportRoot.getObjectByName(`built_${id}`))return;
-  let obj;
-  if(id==='terminal2'){obj=createTerminal(true);obj.position.set(12,0,7)}
-  if(id==='gate2')obj=createGate(5,-2,2);
-  if(id==='gate3')obj=createGate(13,-2,3);
-  if(id==='parking2'){const old=airportRoot.children.find(o=>o.userData?.id==='parking');if(old)airportRoot.remove(old);obj=createParking(true)}
-  if(id==='road'){const old=airportRoot.children.find(o=>o.userData?.id==='road');if(old)airportRoot.remove(old);obj=createRoad(true)}
-  if(id==='tower')obj=createTower();
-  if(id==='fuel')obj=createFuelStation();
-  if(id==='decor')obj=createPark();
-  if(id==='runway2'){runway2=createRunway(new THREE.Vector3(0,.03,-36),82,8);airportRoot.add(runway2);obj=runway2}
-  if(!obj)return;obj.name=`built_${id}`;if(!instant){obj.scale.setScalar(.01);animateScale(obj);confettiAt(obj.position.clone().add(new THREE.Vector3(0,5,0)));playSfx('upgrade')}
-}
-function createTower(){const g=new THREE.Group();g.position.set(24,0,-6);g.add(cyl(2.2,8,mat(0xe8edf0,.7),0,4,0,16));g.add(cyl(3.2,1.8,mat(0x5aafc8,.25,.25,0x21607a,.3),0,8.9,0,16));g.add(cyl(2.6,.4,mat(0x35404b,.45,.3),0,10,0,16));const beacon=cyl(.18,.4,mat(0xff5e6a,.2,.1,0xff2233,3),0,10.4,0);g.add(beacon);lightsRoot.add(beacon.clone());return airportRoot.add(g),g}
-function createFuelStation(){const g=new THREE.Group();g.position.set(20,0,-15);for(let i=0;i<3;i++)g.add(cyl(1.5,3.5,mat(0xe9edf0,.45,.35),i*3,1.75,0,18));g.add(box(11,.35,4.5,mat(0x39434c,.5,.3),3,4,0));g.add(box(3.5,2.5,3,mat(0xf3f4f4,.7),-3.2,1.25,0));return airportRoot.add(g),g}
-function createPark(){const g=new THREE.Group();g.position.set(25,0,18);const pad=new THREE.Mesh(new THREE.CircleGeometry(7,40),mat(0x73af63,1));pad.rotation.x=-Math.PI/2;pad.position.y=.03;g.add(pad);for(let i=0;i<10;i++){const a=i/10*Math.PI*2,r=3.5+Math.random()*2;const t=group(cyl(.14,1.1,mat(0x704d35,1)),new THREE.Mesh(new THREE.SphereGeometry(.7,10,7),mat(0x2b8442,1)));t.children[1].position.y=1.45;t.position.set(Math.cos(a)*r,0,Math.sin(a)*r);g.add(t)}g.add(cyl(1.8,.35,mat(0xc8d4dc,.7),0,.18,0,24));g.add(cyl(.22,2.4,mat(0xdce7ee,.5),0,1.2,0,18));return airportRoot.add(g),g}
-function animateScale(obj){let t=0;const tick=()=>{t+=.055;const e=1-Math.pow(1-t,3);obj.scale.setScalar(Math.max(.01,e));if(t<1)requestAnimationFrame(tick);else obj.scale.setScalar(1)};tick()}
-
-function createPlane(type){
-  const s=type.size,g=new THREE.Group(),bodyMat=mat(type.body,.35,.18),accent=mat(type.accent,.42,.18),dark=mat(0x20252b,.45,.2),glass=mat(0x2d526b,.12,.25,0x1f4b66,.18);
-  const fus=new THREE.Mesh(new THREE.CylinderGeometry(.62*s,.78*s,6.6*s,18),bodyMat);fus.rotation.z=Math.PI/2;fus.castShadow=true;g.add(fus);
-  const nose=new THREE.Mesh(new THREE.SphereGeometry(.78*s,18,10),bodyMat);nose.scale.x=1.5;nose.position.x=3.25*s;nose.castShadow=true;g.add(nose);
-  const tail=new THREE.Mesh(new THREE.ConeGeometry(.72*s,2.2*s,18),bodyMat);tail.rotation.z=-Math.PI/2;tail.position.x=-4.25*s;tail.castShadow=true;g.add(tail);
-  const wingGeo=new THREE.BufferGeometry();wingGeo.setAttribute('position',new THREE.Float32BufferAttribute([-.7,0,0,1.2,0,5.3,-2,0,5.3,-.7,0,0,1.2,0,-5.3,-2,0,-5.3],3));wingGeo.setIndex([0,1,2,3,4,5]);wingGeo.computeVertexNormals();const wings=new THREE.Mesh(wingGeo,bodyMat);wings.scale.setScalar(s);wings.castShadow=true;g.add(wings);
-  const tailWing=box(2.6*s,.12*s,2.6*s,accent,-3.4*s,.15*s,0);tailWing.rotation.y=Math.PI/4;g.add(tailWing);const fin=box(1.9*s,1.7*s,.16*s,accent,-3.25*s,1*s,0);fin.rotation.z=-.35;g.add(fin);
-  const windows=box(3.5*s,.18*s,.04*s,glass,.8*s,.45*s,.77*s);g.add(windows);const stripe=box(5.1*s,.17*s,.04*s,accent,.1*s,.03*s,.8*s);g.add(stripe);
-  const gear=new THREE.Group();for(const x of [-1.4*s,1.5*s])for(const z of [-.65*s,.65*s]){const leg=cyl(.06*s,.75*s,dark,x,-.45*s,z,8);const wheel=new THREE.Mesh(new THREE.TorusGeometry(.18*s,.07*s,6,10),dark);wheel.position.set(x,-.83*s,z);wheel.rotation.x=Math.PI/2;gear.add(leg,wheel)}g.add(gear);g.userData.gear=gear;
-  if(type.prop){for(const x of [-.5*s])for(const z of [-2.3*s,2.3*s]){const hub=cyl(.22*s,.5*s,dark,x,.05,z,10);hub.rotation.z=Math.PI/2;g.add(hub);const prop=new THREE.Group();prop.position.set(.32*s,.05*s,z);for(let i=0;i<3;i++){const blade=box(.12*s,.04*s,1.8*s,dark,0,0,0);blade.rotation.x=i*Math.PI/3;prop.add(blade)}prop.rotation.z=Math.PI/2;g.add(prop);if(!g.userData.props)g.userData.props=[];g.userData.props.push(prop)}}
-  g.scale.setScalar(.9);return g
-}
-
-function spawnFlight(){
-  if(!gameStarted||state.paused)return;const free=gates.find(g=>!g.occupied);if(!free)return;
-  const choices=PLANE_TYPES.filter(t=>t.unlock<=state.level&&(!t.requires||state.built[t.requires]));const type=choices[Math.floor(Math.random()*choices.length)];const mesh=createPlane(type);mesh.position.set(-58,19,-18);mesh.rotation.y=0;aircraftRoot.add(mesh);free.occupied=true;
-  const pax=Math.floor(lerp(type.pax[0],type.pax[1],Math.random()));const plane={mesh,type,gate:free,state:'approach',time:0,pax,earned:0};aircraft.push(plane);lastFlightSpawn=state.playTime;toast(`${type.name} inbound`,`${pax} passengers are approaching Gate ${free.index}.`);playSfx('radio');
-}
-function updateAircraft(dt){
-  const speedBoost=1+state.upgrades.runway*.06;const turnBoost=1+state.upgrades.turnaround*.1;const boardBoost=1+state.upgrades.boarding*.12;
-  for(let i=aircraft.length-1;i>=0;i--){const p=aircraft[i];p.time+=dt;if(p.mesh.userData.props)p.mesh.userData.props.forEach(pr=>pr.rotation.x+=dt*24);
-    if(p.state==='approach'){const d=8/speedBoost,t=clamp(p.time/d,0,1),e=smooth(t);p.mesh.position.set(lerp(-58,-34,e),lerp(19,.85,e),-18);p.mesh.rotation.z=lerp(-.05,0,e);p.mesh.userData.gear.visible=t>.24;if(t>=1){p.state='landing';p.time=0;landingSmoke(new THREE.Vector3(-31,.2,-18));playSfx('land')}}
-    else if(p.state==='landing'){const d=6/speedBoost,t=clamp(p.time/d,0,1);p.mesh.position.x=lerp(-34,-12,smooth(t));p.mesh.position.y=.85;if(t>=1){p.state='taxiIn';p.time=0}}
-    else if(p.state==='taxiIn'){const d=8,t=clamp(p.time/d,0,1);const e=smooth(t),a=new THREE.Vector3(-12,.85,-18),b=new THREE.Vector3(-12,.85,-10),c=p.gate.position.clone().add(new THREE.Vector3(-3,.85,0));const q=t<.45?a.clone().lerp(b,e/ .45):b.clone().lerp(c,(e-.45)/.55);p.mesh.position.copy(q);p.mesh.rotation.y=lerp(0,-Math.PI/2,clamp((t-.35)/.4,0,1));if(t>=1){p.state='parked';p.time=0;spawnPassengerFlow(p)}}
-    else if(p.state==='parked'){const duration=(p.type.duration/(turnBoost*boardBoost));if(p.time>=duration){p.state='taxiOut';p.time=0;clearPlanePassengers(p)}}
-    else if(p.state==='taxiOut'){const d=8,t=clamp(p.time/d,0,1),e=smooth(t),a=p.gate.position.clone().add(new THREE.Vector3(-3,.85,0)),b=new THREE.Vector3(15,.85,-10),c=new THREE.Vector3(15,.85,-18);const q=t<.55?a.clone().lerp(b,e/.55):b.clone().lerp(c,(e-.55)/.45);p.mesh.position.copy(q);p.mesh.rotation.y=lerp(-Math.PI/2,0,clamp((t-.35)/.45,0,1));if(t>=1){p.state='takeoff';p.time=0;playSfx('takeoff')}}
-    else if(p.state==='takeoff'){const d=7/speedBoost,t=clamp(p.time/d,0,1),e=smooth(t);p.mesh.position.set(lerp(15,60,e),lerp(.85,24,Math.pow(t,1.6)),-18);p.mesh.userData.gear.visible=t<.28;if(t>=1){completeFlight(p);aircraftRoot.remove(p.mesh);aircraft.splice(i,1)}}
-  }
-}
-function completeFlight(p){
-  p.gate.occupied=false;const ticketBoost=1+state.upgrades.ticket*.1;const terminalBoost=1+state.upgrades.terminal*.08;const happyBoost=.85+state.happiness/400;const gross=p.pax*p.type.income*ticketBoost*terminalBoost*happyBoost;const fuelReduction=state.built.fuel?.12:0;const expense=gross*(.18-fuelReduction*.5);const earned=Math.round(gross-expense);state.money+=earned;state.totalIncome+=gross;state.totalExpenses+=expense;state.passengers+=p.pax;state.flights++;state.xp+=Math.max(12,Math.floor(p.pax/5));state.incomeHistory.push(earned);state.incomeHistory=state.incomeHistory.slice(-16);moneyPop(earned);playSfx('cash');checkLevel();updateUI();
-}
-function spawnPassengerFlow(plane){
-  const visibleCount=Math.min(18,Math.max(6,Math.floor(plane.pax/10)));plane.passengerIds=[];
-  for(let i=0;i<visibleCount;i++){const person=createPerson(i);const start=plane.gate.position.clone().add(new THREE.Vector3(-2.5+(i%3)*.45,.45,(i%4-2)*.35));const end=new THREE.Vector3(-7+(i%5)*.5,.45,6+(i%3)*.5);person.position.copy(start);passengerRoot.add(person);const obj={mesh:person,start,end,t:-i*.05,speed:.075+Math.random()*.02,plane,mode:'unload'};passengers.push(obj);plane.passengerIds.push(obj)}
-}
-function createPerson(i){const g=new THREE.Group();const colors=[0x4a90e2,0xff7c66,0x5fd18d,0xf2c94c,0x9b6df1];g.add(cyl(.15,.5,mat(colors[i%colors.length],.8),0,.4,0,8));const head=new THREE.Mesh(new THREE.SphereGeometry(.13,8,6),mat([0xf0c7a5,0xc89269,0x8f5d3e][i%3],.9));head.position.y=.8;g.add(head);g.scale.setScalar(.9);return g}
-function updatePassengers(dt){
-  for(let i=passengers.length-1;i>=0;i--){const p=passengers[i];p.t+=dt*p.speed;if(p.t<0)continue;const t=clamp(p.t,0,1),e=smooth(t);p.mesh.position.lerpVectors(p.start,p.end,e);p.mesh.position.y=.45+Math.sin(t*Math.PI*10)*.04;p.mesh.rotation.y=Math.atan2(p.end.x-p.start.x,p.end.z-p.start.z);
-    if(t>=1){if(p.mode==='unload'){p.mode='board';p.t=-.35-Math.random()*.55;const tmp=p.start;p.start=p.end;p.end=tmp}else{passengerRoot.remove(p.mesh);passengers.splice(i,1)}}
-  }
-}
-function clearPlanePassengers(plane){for(let i=passengers.length-1;i>=0;i--){if(passengers[i].plane===plane){passengerRoot.remove(passengers[i].mesh);passengers.splice(i,1)}}}
-function landingSmoke(pos){for(let i=0;i<14;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.22+Math.random()*.35,8,6),new THREE.MeshBasicMaterial({color:0xd9e1e8,transparent:true,opacity:.55}));m.position.copy(pos).add(new THREE.Vector3((Math.random()-.5)*3,Math.random()*.3,(Math.random()-.5)*2));fxRoot.add(m);let t=0;const tick=()=>{t+=.03;m.position.y+=.025;m.scale.multiplyScalar(1.025);m.material.opacity=.55*(1-t);if(t<1)requestAnimationFrame(tick);else fxRoot.remove(m)};tick()}}
-function confettiAt(pos){const colors=[0x52c9ff,0x7effa8,0xffd166,0xff758f,0xffffff];for(let i=0;i<50;i++){const m=box(.12,.2,.05,new THREE.MeshBasicMaterial({color:colors[i%colors.length]}));m.position.copy(pos);m.userData.v=new THREE.Vector3((Math.random()-.5)*7,3+Math.random()*6,(Math.random()-.5)*7);fxRoot.add(m);let t=0;const tick=()=>{t+=.025;m.userData.v.y-=.12;m.position.addScaledVector(m.userData.v,.035);m.rotation.x+=.2;m.rotation.z+=.15;if(t<1.4)requestAnimationFrame(tick);else fxRoot.remove(m)};tick()}}
-
-function updateVehicles(dt){vehicles.forEach((v,i)=>{v.t=(v.t+dt*v.speed*v.dir)%1;if(v.t<0)v.t+=1;if(v.cart){const x=lerp(-15,15,v.t);v.mesh.position.set(x,.2,1.5+Math.sin(v.t*Math.PI*2)*1.5);v.mesh.rotation.y=v.dir>0?Math.PI/2:-Math.PI/2}else{const x=lerp(-31,27,v.t);v.mesh.position.x=x;v.mesh.position.z=23.2+(i%2)*3.5;v.mesh.rotation.y=v.dir>0?Math.PI/2:-Math.PI/2}})}
-
-function updateWorld(dt){
-  worldTime=(worldTime+dt/240)%1;const daylight=(Math.sin(worldTime*Math.PI*2-Math.PI/2)+1)/2;const day=clamp((daylight-.08)/.7,0,1);sun.intensity=lerp(.15,4.3,day);hemi.intensity=lerp(.25,1.8,day);sun.position.set(Math.cos(worldTime*Math.PI*2)*70,lerp(-10,75,daylight),Math.sin(worldTime*Math.PI*2)*45);const skyColor=new THREE.Color().lerpColors(new THREE.Color(0x061126),new THREE.Color(0x86c9f4),day);sky.material.color.copy(skyColor);scene.fog.color.copy(skyColor).lerp(new THREE.Color(0x71838f),weather==='Rain'?0.35:0.08);lightsRoot.visible=day<.52;
-  clouds.forEach((c,i)=>{c.position.x+=dt*(.55+i*.015);if(c.position.x>85)c.position.x=-85});if(rainDrops.visible){const p=rainDrops.geometry.attributes.position.array;for(let i=0;i<p.length;i+=3){p[i+1]-=dt*24;if(p[i+1]<0)p[i+1]=55}rainDrops.geometry.attributes.position.needsUpdate=true}
-  const weatherPeriod=Math.floor(state.playTime/90);if(weatherPeriod>0&&weatherPeriod!==lastWeatherPeriod){lastWeatherPeriod=weatherPeriod;changeWeather()}
-  const mins=Math.floor(worldTime*24*60),hh=String(Math.floor(mins/60)).padStart(2,'0'),mm=String(mins%60).padStart(2,'0');$('#weatherText').textContent=`${weather} • ${hh}:${mm}`;
-}
-function changeWeather(force){const opts=['Sunny','Cloudy','Rain'];weather=force||opts[Math.floor(Math.random()*opts.length)];rainDrops.visible=weather==='Rain';clouds.forEach(c=>c.visible=weather!=='Sunny');bloom.strength=weather==='Rain'?.55:.4;toast('Weather changed',`${weather} skies over Skyport.`)}
-
-function economyTick(dt){
-  lastEconomy+=dt;if(lastEconomy<1)return;const sec=lastEconomy;lastEconomy=0;let expense=(8+state.level*2.3+gates.length*1.6);expense*=1-state.upgrades.maintenance*.08;const parking=state.passengers>0?(state.built.parking2?5.5:2.5):0;const passive=parking+state.level*.8;state.money+=passive*sec-expense*sec;state.totalIncome+=passive*sec;state.totalExpenses+=expense*sec;
-  state.happiness=clamp(70+state.upgrades.happiness*4+(state.built.decor?7:0)-(weather==='Rain'?2:0),55,100);updateUI();
-}
-function checkLevel(){
-  const need=100+state.level*75;while(state.xp>=need){state.xp-=need;state.level++;const reward=10000+state.level*4500;state.money+=reward;toast(`Airport Level ${state.level}`,`New facilities unlocked. Bonus ${money(reward)}.`);confettiAt(new THREE.Vector3(0,8,2));playSfx('level')}
-}
-function nextLevelNeed(){return 100+state.level*75}
-function flightInterval(){return Math.max(18,52-state.level*3-(state.built.tower?8:0)-(state.built.runway2?8:0))}
-
-function renderBuildCards(){
-  $('#buildGrid').innerHTML=BUILDINGS.map(b=>{const locked=state.level<b.level,owned=state.built[b.id];return `<article class="shop-card ${locked?'locked':''}"><div class="level-badge">Lv ${b.level}</div><div class="card-icon">${b.icon}</div><h3>${b.name}</h3><p>${b.desc}</p><div class="card-footer"><span class="price">${money(b.price)}</span>${owned?'<span class="owned-badge">Built</span>':`<button class="card-btn" data-build="${b.id}" ${locked||state.money<b.price?'disabled':''}>${locked?'Locked':'Build'}</button>`}</div></article>`}).join('');
-  $$('[data-build]').forEach(btn=>btn.onclick=()=>startPlacement(btn.dataset.build));
-}
-function renderUpgradeCards(){
-  $('#upgradeGrid').innerHTML=UPGRADES.map(u=>{const lv=state.upgrades[u.id],price=Math.round(u.base*Math.pow(1.58,lv)),max=lv>=u.max;return `<article class="shop-card"><div class="level-badge">${lv}/${u.max}</div><div class="card-icon">↑</div><h3>${u.name}</h3><p>${u.desc}</p><div class="card-footer"><span class="price">${max?'MAX':money(price)}</span><button class="card-btn" data-upgrade="${u.id}" ${max||state.money<price?'disabled':''}>${max?'Done':'Upgrade'}</button></div></article>`}).join('');
-  $$('[data-upgrade]').forEach(btn=>btn.onclick=()=>buyUpgrade(btn.dataset.upgrade));
-}
-function buyUpgrade(id){const u=UPGRADES.find(x=>x.id===id),lv=state.upgrades[id],price=Math.round(u.base*Math.pow(1.58,lv));if(lv>=u.max||state.money<price)return;state.money-=price;state.upgrades[id]++;if(id==='happiness')state.happiness=clamp(state.happiness+4,0,100);toast(`${u.name} upgraded`,`Now level ${state.upgrades[id]} of ${u.max}.`);confettiAt(new THREE.Vector3(-12,6,7));playSfx('upgrade');updateUI();renderUpgradeCards();saveState()}
-function startPlacement(id){
-  const b=BUILDINGS.find(x=>x.id===id);if(!b||state.money<b.price||state.built[id])return;activePlacement=b;closePanels();$('#placeHint').classList.add('show');
-  const zone=new THREE.Mesh(new THREE.CylinderGeometry(4.4,4.4,.15,40),new THREE.MeshBasicMaterial({color:0x52c9ff,transparent:true,opacity:.32,depthWrite:false}));zone.position.copy(b.slot);zone.position.y=.09;zone.userData.buildId=id;constructionRoot.add(zone);placementZone=zone;
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(4.8,.12,8,48),new THREE.MeshBasicMaterial({color:0x9be7ff,transparent:true,opacity:.9}));ring.rotation.x=Math.PI/2;zone.add(ring);placementGhost=zone;
-}
-function cancelPlacement(){if(placementGhost)constructionRoot.remove(placementGhost);placementGhost=placementZone=null;activePlacement=null;$('#placeHint').classList.remove('show')}
-function onWorldTap(e){if(!activePlacement)return;const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObject(placementZone,true);if(hits.length)confirmPlacement()}
-function confirmPlacement(){const b=activePlacement;if(!b||state.money<b.price)return cancelPlacement();state.money-=b.price;state.built[b.id]=true;constructBuilding(b.id,false);toast(`${b.name} built`,'Your airport has visibly expanded.');state.xp+=30+b.level*6;checkLevel();cancelPlacement();updateUI();renderBuildCards();saveState()}
-
-function updateStats(){
-  const profit=state.totalIncome-state.totalExpenses,eff=Math.round((state.flights/(Math.max(1,state.playTime/60)))*10)/10;
-  $('#statGrid').innerHTML=[['Total income',money(state.totalIncome)],['Total expenses',money(state.totalExpenses)],['Net profit',money(profit)],['Flights / min',eff],['Happiness',`${Math.round(state.happiness)}%`],['Gates',gates.length],['Play time',`${Math.floor(state.playTime/60)} min`],['Next flight',`${Math.max(0,Math.ceil(flightInterval()-(state.playTime-lastFlightSpawn)))}s`]].map(([a,b])=>`<div class="stat-card"><div class="big">${b}</div><div class="small">${a}</div></div>`).join('');
-  const max=Math.max(1,...state.incomeHistory);$('#bars').innerHTML=state.incomeHistory.map(v=>`<div class="bar" style="height:${Math.max(3,v/max*100)}%" title="${money(v)}"></div>`).join('')
-}
-function updateUI(){
-  $('#moneyValue').textContent=money(state.money);$('#passengerValue').textContent=fmt(state.passengers);$('#flightValue').textContent=fmt(state.flights);$('#levelValue').textContent=state.level;$('#levelName').textContent=['','Local','Regional','Growing','City','National','International','Global'][Math.min(7,state.level)]||'Global';$('#xpBar').style.width=`${clamp(state.xp/nextLevelNeed()*100,0,100)}%`;renderBuildCards();renderUpgradeCards();
-}
-function applyLanguage(){const dict=I18N[state.settings.language]||I18N.en;$$('[data-i18n]').forEach(el=>{if(dict[el.dataset.i18n])el.textContent=dict[el.dataset.i18n]});$('#languageSelect').value=state.settings.language;updateUI()}
-
-function openPanel(id){cancelPlacement();$$('.panel').forEach(p=>p.classList.toggle('open',p.id===id&&!p.classList.contains('open')));$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.panel===id&&$(`#${id}`).classList.contains('open')));if(id==='statsPanel')updateStats()}
-function closePanels(){$$('.panel').forEach(p=>p.classList.remove('open'));$$('.tab-btn').forEach(b=>b.classList.remove('active'))}
-function showModal(html){$('#modal').innerHTML=html;$('#modalLayer').classList.add('open')}
-function hideModal(){$('#modalLayer').classList.remove('open')}
-function toast(title,text){const el=document.createElement('div');el.className='toast';el.innerHTML=`<div class="toast-title">${title}</div><div class="toast-text">${text}</div>`;$('#toastStack').appendChild(el);setTimeout(()=>{el.style.opacity=0;el.style.transform='translateX(20px)';setTimeout(()=>el.remove(),250)},3800)}
-function moneyPop(amount){const el=document.createElement('div');el.className='money-pop';el.textContent=`+${money(amount)}`;el.style.left=`${innerWidth*.5+(Math.random()-.5)*120}px`;el.style.top=`${innerHeight*.37}px`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300)}
-
-function initAudio(){
-  if(audio)return;audio=new (window.AudioContext||window.webkitAudioContext)();const master=audio.createGain();master.gain.value=.65;master.connect(audio.destination);musicGain=audio.createGain();effectsGain=audio.createGain();ambienceGain=audio.createGain();musicGain.connect(master);effectsGain.connect(master);ambienceGain.connect(musicGain);applyAudioSettings();
-  const osc=audio.createOscillator();const lfo=audio.createOscillator();const lfoGain=audio.createGain();osc.type='sine';osc.frequency.value=72;lfo.frequency.value=.07;lfoGain.gain.value=8;lfo.connect(lfoGain);lfoGain.connect(osc.frequency);osc.connect(ambienceGain);ambienceGain.gain.value=.025;osc.start();lfo.start();
-}
-function applyAudioSettings(){if(!audio)return;musicGain.gain.value=state.settings.music/100;effectsGain.gain.value=state.settings.effects/100}
-function playSfx(type){if(!audio)return;const now=audio.currentTime;const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(effectsGain);let f1=320,f2=520,d=.14,w='sine';if(type==='cash'){f1=520;f2=920;d=.22}if(type==='upgrade'){f1=280;f2=680;d=.45}if(type==='level'){f1=360;f2=980;d=.7}if(type==='land'){f1=120;f2=60;d=.5;w='sawtooth'}if(type==='takeoff'){f1=90;f2=240;d=.8;w='sawtooth'}if(type==='radio'){f1=480;f2=420;d=.12;w='square'}if(type==='save'){f1=660;f2=760;d=.12}o.type=w;o.frequency.setValueAtTime(f1,now);o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),now+d);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.13,now+.02);g.gain.exponentialRampToValueAtTime(.0001,now+d);o.start(now);o.stop(now+d+.03)}
-
-function applyGraphics(){
-  const q=state.settings.graphics;const ratio=q==='high'?Math.min(devicePixelRatio,2):q==='medium'?Math.min(devicePixelRatio,1.35):1;renderer.setPixelRatio(ratio);renderer.shadowMap.enabled=q!=='low';sun.shadow.mapSize.set(q==='high'?2048:1024,q==='high'?2048:1024);bloom.enabled=q!=='low';scene.fog.density=q==='low'?.0085:.007;
-}
-function togglePause(){state.paused=!state.paused;$('#pauseBtn').innerHTML=state.paused?'<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>';toast(state.paused?'Paused':'Resumed',state.paused?'Airport operations are paused.':'Flights are moving again.');}
-function fullscreen(){const el=document.documentElement;if(!document.fullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen)?.call(el)}else{(document.exitFullscreen||document.webkitExitFullscreen)?.call(document)}}
-
-function startGame(newGame=false){
-  if(newGame){const preservedSettings={...state.settings};state=DEFAULT_STATE();state.settings=preservedSettings;localStorage.removeItem(SAVE_KEY);clearDynamicWorld();applyGraphics();applyLanguage()}
-  initAudio();gameStarted=true;$('#menu').classList.add('hidden');$('#hud').classList.add('show');closePanels();cancelPlacement();applyBuiltState();updateUI();lastFlightSpawn=state.playTime-flightInterval()-1;toast('Welcome to Skyport','Your first arriving aircraft is already on approach.');saveState();
-}
-function clearDynamicWorld(){
-  aircraft.forEach(p=>aircraftRoot.remove(p.mesh));aircraft=[];passengers.forEach(p=>passengerRoot.remove(p.mesh));passengers=[];gates.forEach(g=>{if(g.index>1)airportRoot.remove(g.group)});gates=gates.filter(g=>g.index===1);gateObjects=gateObjects.filter(g=>g.userData.gateIndex===1);[...airportRoot.children].forEach(o=>{if(o.name?.startsWith('built_'))airportRoot.remove(o)});runway2=null;
-  if(!airportRoot.children.some(o=>o.userData?.id==='parking'))createParking(false);
-  if(!airportRoot.children.some(o=>o.userData?.id==='road'))createRoad(false);
-}
-
-
-function bindUI(){
-  $('#newGameBtn').onclick=()=>{if(localStorage.getItem(SAVE_KEY)){showModal(`<h2>Start a new airport?</h2><p>This will replace the current save. The existing airport cannot be restored.</p><div class="modal-actions"><button class="secondary-btn" id="cancelNew">Cancel</button><button class="danger-btn" id="confirmNew">Start New</button></div>`);$('#cancelNew').onclick=hideModal;$('#confirmNew').onclick=()=>{hideModal();startGame(true)}}else startGame(true)};
-  $('#continueBtn').onclick=()=>startGame(false);$('#menuSettingsBtn').onclick=()=>{showModal(`<h2>Settings</h2><div class="settings-grid" style="grid-template-columns:1fr"><div class="setting"><label><span>Music volume</span><small id="menuMusicVal">${state.settings.music}%</small></label><input id="menuMusic" type="range" min="0" max="100" value="${state.settings.music}"></div><div class="setting"><label><span>Effects volume</span><small id="menuEffectsVal">${state.settings.effects}%</small></label><input id="menuEffects" type="range" min="0" max="100" value="${state.settings.effects}"></div><div class="setting"><label><span>Graphics</span></label><select id="menuGraphics"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div><div class="setting"><label><span>Language</span></label><select id="menuLanguage"><option value="en">English</option><option value="ru">Русский</option></select></div></div><div class="modal-actions"><button class="primary-btn" id="saveMenuSettings">Done</button></div>`);$('#menuGraphics').value=state.settings.graphics;$('#menuLanguage').value=state.settings.language;$('#menuMusic').oninput=e=>$('#menuMusicVal').textContent=`${e.target.value}%`;$('#menuEffects').oninput=e=>$('#menuEffectsVal').textContent=`${e.target.value}%`;$('#saveMenuSettings').onclick=()=>{state.settings.music=+$('#menuMusic').value;state.settings.effects=+$('#menuEffects').value;state.settings.graphics=$('#menuGraphics').value;state.settings.language=$('#menuLanguage').value;persistSettings();syncSettingsUI();applyGraphics();applyLanguage();applyAudioSettings();hideModal()}};$('#aboutBtn').onclick=()=>showModal(`<h2>About Skyport</h2><p>A relaxing single-file airport tycoon built with Three.js. Grow from one runway to a living international hub with dynamic flights, passengers, weather, day/night and permanent progression.</p><div class="modal-actions"><button class="primary-btn" id="okModal">Fly</button></div>`);
-  $('#modalLayer').addEventListener('click',e=>{if(e.target.id==='modalLayer')hideModal()});document.addEventListener('click',e=>{if(e.target.id==='okModal')hideModal()});
-  $$('.tab-btn').forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));$$('.close-btn').forEach(b=>b.onclick=closePanels);
-  $('#saveBtn').onclick=()=>saveState(true);$('#manualSaveSettings').onclick=()=>saveState(true);$('#fullscreenBtn').onclick=fullscreen;$('#pauseBtn').onclick=togglePause;
-  $('#resetBtn').onclick=()=>{showModal(`<h2>Reset save?</h2><p>This permanently deletes your airport progress.</p><div class="modal-actions"><button class="secondary-btn" id="cancelReset">Cancel</button><button class="danger-btn" id="confirmReset">Delete</button></div>`);$('#cancelReset').onclick=hideModal;$('#confirmReset').onclick=()=>{localStorage.removeItem(SAVE_KEY);state=DEFAULT_STATE();location.reload()}};
-  $('#musicRange').oninput=e=>{state.settings.music=+e.target.value;$('#musicVal').textContent=`${e.target.value}%`;applyAudioSettings();persistSettings()};$('#effectsRange').oninput=e=>{state.settings.effects=+e.target.value;$('#effectsVal').textContent=`${e.target.value}%`;applyAudioSettings();persistSettings()};$('#graphicsSelect').onchange=e=>{state.settings.graphics=e.target.value;applyGraphics();persistSettings();saveState()};$('#languageSelect').onchange=e=>{state.settings.language=e.target.value;applyLanguage();persistSettings();saveState()};
-  document.addEventListener('pointermove',e=>{const t=e.target.closest('[data-tip]'),tip=$('#tooltip');if(!t){tip.style.opacity=0;tip.style.visibility='hidden';return}tip.textContent=t.dataset.tip;tip.style.left=`${Math.min(innerWidth-230,e.clientX+14)}px`;tip.style.top=`${Math.min(innerHeight-50,e.clientY+14)}px`;tip.style.opacity=1;tip.style.visibility='visible'});
-}
-function syncSettingsUI(){$('#musicRange').value=state.settings.music;$('#effectsRange').value=state.settings.effects;$('#musicVal').textContent=`${state.settings.music}%`;$('#effectsVal').textContent=`${state.settings.effects}%`;$('#graphicsSelect').value=state.settings.graphics;$('#languageSelect').value=state.settings.language}
-
-function onResize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight)}
-function animate(){requestAnimationFrame(animate);const dt=Math.min(.05,clock.getDelta());controls.update();if(!gameStarted){updateWorld(dt*.35);updateVehicles(dt*.7)}if(gameStarted&&!state.paused){state.playTime+=dt;updateWorld(dt);updateAircraft(dt);updatePassengers(dt);updateVehicles(dt);economyTick(dt);if(state.playTime-lastFlightSpawn>flightInterval())spawnFlight();lastAutosave+=dt;if(lastAutosave>20){saveState();lastAutosave=0}lastHistory+=dt;if(lastHistory>30){state.incomeHistory.push(0);state.incomeHistory=state.incomeHistory.slice(-16);lastHistory=0}}
-  if(activePlacement&&placementZone){placementZone.rotation.y+=dt;placementZone.material.opacity=.24+Math.sin(performance.now()*.004)*.12}
-  composer.render();
-}
-
-async function boot(){
-  bindUI();let p=0;const tip=$('#loadingTip');const timer=setInterval(()=>{p=Math.min(94,p+5+Math.random()*9);$('#progressBar').style.width=`${p}%`;tip.textContent=tips[Math.floor(Math.random()*tips.length)]},210);
-  initThree();const hasSave=loadState();$('#continueBtn').disabled=!hasSave;syncSettingsUI();applyLanguage();applyBuiltState();updateUI();animate();await new Promise(r=>setTimeout(r,1650));clearInterval(timer);$('#progressBar').style.width='100%';tip.textContent='Airport ready for operations.';setTimeout(()=>$('#loading').classList.add('done'),360)
-}
-boot().catch(err=>{console.error(err); showFatalError(err?.message||String(err));});
-</script>
+    let game;
+    async function boot(){
+      const stages=["Загрузка 3D-движка","Создание ландшафта","Строительство терминала","Подготовка самолётов","Запуск диспетчерской"],tips=[
+        "Дополнительные гейты позволяют обслуживать несколько рейсов одновременно.",
+        "Ночью огни полосы и терминала включаются автоматически.",
+        "Улучшение наземной команды быстрее всего освобождает гейты.",
+        "Погода меняет атмосферу, но не штрафует ваш аэропорт.",
+        "Прогресс сохраняется автоматически каждые 15 секунд."
+      ];let p=5;const timer=setInterval(()=>{p=Math.min(92,p+3+Math.random()*7);$("#loadBar").style.width=p+"%";$("#loadPercent").textContent=Math.floor(p)+"%";$("#loadStage").textContent=stages[Math.min(stages.length-1,Math.floor(p/21))];if(Math.random()>.7)$("#loadTip").textContent=tips[Math.floor(Math.random()*tips.length)]},180);
+      await new Promise(r=>setTimeout(r,120));game=new AirportGame();await new Promise(r=>setTimeout(r,850));clearInterval(timer);$("#loadBar").style.width="100%";$("#loadPercent").textContent="100%";$("#loadStage").textContent="Аэропорт готов";setTimeout(()=>$("#loading").classList.add("done"),420);
+    }
+    boot();
+  </script>
 </body>
 </html>
